@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>DISC Veteranas · Peña Recreativa Sant Feliu</title>
+<style>
+:root{
+  --d:#E24B4A;--dl:#FCEBEB;--dm:#F09595;
+  --i:#EF9F27;--il:#FAEEDA;--im:#FAC775;
+  --s:#1D9E75;--sl:#E1F5EE;--sm:#9FE1CB;
+  --c:#378ADD;--cl:#E6F1FB;--cm:#85B7EB;
+  --bg:#ffffff;--bg2:#f5f5f7;--border:#e5e5e7;--border2:#d1d1d6;
+  --text:#1d1d1f;--text2:#6e6e73;--text3:#aeaeb2;
+  --radius:14px;--radius-sm:10px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f0f0f5;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:1rem;}
+#app{width:100%;max-width:420px;background:var(--bg);border-radius:20px;padding:1.25rem;min-height:600px;display:flex;flex-direction:column;box-shadow:0 4px 32px rgba(0,0,0,.10);}
+.screen{display:none;flex-direction:column;flex:1;}
+.screen.active{display:flex;}
+
+/* WELCOME */
+.welcome-hero{text-align:center;padding:1rem 0;}
+.club-badge{font-size:48px;margin-bottom:.75rem;}
+.disc-logo{display:flex;gap:6px;justify-content:center;margin-bottom:1rem;}
+.dl{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600;}
+.dl.d{background:var(--dl);color:var(--d);border:1px solid var(--dm);}
+.dl.i{background:var(--il);color:var(--i);border:1px solid var(--im);}
+.dl.s{background:var(--sl);color:var(--s);border:1px solid var(--sm);}
+.dl.c{background:var(--cl);color:var(--c);border:1px solid var(--cm);}
+.welcome-title{font-size:20px;font-weight:600;margin-bottom:4px;color:var(--text);}
+.welcome-club{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.welcome-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;}
+.info-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem;}
+.ic{background:var(--bg2);border-radius:var(--radius-sm);padding:11px;text-align:center;}
+.ic .n{font-size:19px;font-weight:600;color:var(--text);}
+.ic .l{font-size:11px;color:var(--text2);margin-top:2px;}
+.btn-g{width:100%;padding:13px;background:var(--s);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-bottom:8px;}
+.btn-g:hover{opacity:.85;}
+.btn-sec{width:100%;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;color:var(--text);transition:background .15s;}
+.btn-sec:hover{background:var(--border);}
+
+/* SETUP */
+.sec-title{font-size:16px;font-weight:600;margin-bottom:4px;color:var(--text);}
+.sec-sub{font-size:13px;color:var(--text2);margin-bottom:1rem;}
+.player-list{display:flex;flex-direction:column;gap:6px;margin-bottom:.75rem;max-height:340px;overflow-y:auto;}
+.player-row{display:flex;gap:8px;align-items:center;}
+.player-num{width:22px;font-size:12px;color:var(--text3);text-align:center;flex-shrink:0;}
+.player-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);}
+.player-input:focus{outline:none;border-color:var(--s);}
+.btn-del{width:32px;height:32px;border:none;background:var(--dl);color:var(--d);border-radius:8px;cursor:pointer;font-size:15px;flex-shrink:0;}
+.btn-add-p{padding:8px 14px;background:var(--sl);color:var(--s);border:1px solid var(--sm);border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:1rem;width:100%;}
+
+/* QUIZ */
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:2px;transition:width .3s ease;}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem;}
+.quiz-counter{font-size:13px;color:var(--text2);}
+.badge{font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;}
+.qcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;margin-bottom:1rem;}
+.qemoji{font-size:20px;margin-bottom:7px;}
+.qtext{font-size:14px;font-weight:500;color:var(--text);line-height:1.55;}
+.opts-lbl{font-size:12px;color:var(--text2);margin-bottom:9px;}
+.opts{display:flex;flex-direction:column;gap:7px;}
+.obt{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:left;cursor:pointer;transition:all .15s;}
+.obt:hover{background:var(--bg2);}
+.obt.sel{border-width:2px;}
+.obt .ot{font-size:13px;color:var(--text);line-height:1.4;}
+.nav-row{display:flex;gap:8px;margin-top:auto;padding-top:1rem;}
+.btn-back{flex:0 0 44px;height:44px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:18px;color:var(--text);}
+.btn-next{flex:1;height:44px;background:var(--s);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.btn-next:disabled{opacity:.3;cursor:not-allowed;}
+.btn-next:not(:disabled):hover{opacity:.85;}
+
+/* SELECT PLAYER */
+.voter-select{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--bg);color:var(--text);margin-bottom:1rem;}
+.voter-select:focus{outline:none;border-color:var(--s);}
+
+/* RESULTS INDIVIDUAL */
+.res-header{text-align:center;padding:1rem 0 .5rem;}
+.res-circle{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:600;margin:0 auto .75rem;}
+.res-title{font-size:17px;font-weight:600;margin-bottom:3px;}
+.res-sub{font-size:13px;color:var(--text2);}
+.score-bars{display:flex;flex-direction:column;gap:10px;margin:1rem 0;}
+.srow{display:flex;align-items:center;gap:8px;}
+.slabel{width:90px;font-size:12px;font-weight:500;}
+.strack{flex:1;height:9px;background:var(--bg2);border-radius:5px;overflow:hidden;}
+.sfill{height:100%;border-radius:5px;transition:width .8s ease;}
+.spct{width:32px;font-size:12px;text-align:right;color:var(--text2);}
+.pcard{background:var(--bg2);border-radius:var(--radius);padding:1rem;margin-bottom:.75rem;}
+.pcard h3{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text);}
+.pcard p{font-size:13px;color:var(--text2);line-height:1.6;}
+.traits{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:.75rem;}
+.tpill{border-radius:20px;padding:7px 8px;font-size:11px;text-align:center;line-height:1.3;font-weight:500;}
+.dtabs{display:flex;gap:5px;margin-bottom:.75rem;overflow-x:auto;}
+.dtab{flex:1;min-width:52px;padding:7px 3px;border:1px solid var(--border);background:var(--bg2);border-radius:var(--radius-sm);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;text-align:center;color:var(--text2);}
+.dtab.active{border-width:2px;}
+.dpanel{display:none;}.dpanel.active{display:block;}
+
+/* VOTING */
+.vcard{background:var(--bg2);border-radius:var(--radius);padding:1rem;margin-bottom:.875rem;}
+.vcard-name{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--text);}
+.color-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.copt{padding:9px 7px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;text-align:center;transition:all .15s;background:var(--bg);}
+.copt:hover{border-color:var(--border2);}
+.copt.sel{transform:none;}
+.copt .cletter{font-size:18px;font-weight:600;display:block;margin-bottom:2px;}
+.copt .cname{font-size:11px;font-weight:600;display:block;}
+.copt .cdesc{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.3;display:block;}
+.vote-prog{font-size:12px;color:var(--text2);text-align:center;margin-bottom:1rem;background:var(--bg2);padding:7px;border-radius:var(--radius-sm);}
+
+/* TEAM RESULTS */
+.tpc{background:var(--bg2);border-radius:var(--radius);padding:.875rem;margin-bottom:.75rem;}
+.tpc-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.tpc-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;flex-shrink:0;}
+.tpc-name{font-size:14px;font-weight:600;color:var(--text);}
+.tpc-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:inline-block;margin-top:2px;}
+.mini-bars{display:flex;flex-direction:column;gap:5px;}
+.mrow{display:flex;align-items:center;gap:6px;}
+.mlabel{width:72px;font-size:11px;font-weight:500;}
+.mtrack{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.mfill{height:100%;border-radius:3px;}
+.mpct{width:28px;font-size:10px;text-align:right;color:var(--text2);}
+.votes-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.votes-label{font-size:11px;color:var(--text2);margin-bottom:6px;}
+.vote-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.vchip{border-radius:20px;padding:3px 9px;font-size:11px;font-weight:500;}
+.match-note{font-size:11px;margin-top:4px;}
+.team-dist{margin-top:.75rem;}
+.dist-grid{display:flex;gap:7px;margin-top:7px;}
+.dist-cell{flex:1;border-radius:var(--radius-sm);padding:9px 6px;text-align:center;}
+.dist-cell .dc-letter{font-size:18px;font-weight:600;}
+.dist-cell .dc-count{font-size:12px;margin-top:2px;}
+.section-scroll{overflow-y:auto;flex:1;}
+
+.sync-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 12px;border-radius:20px;background:var(--sl);color:var(--s);font-weight:500;margin-bottom:1rem;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--s);animation:p 1.5s infinite;}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.overlay{position:fixed;inset:0;background:rgba(255,255,255,.9);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:12px;}
+.spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--s);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none;}
+.toast.on{opacity:1;}
+
+</style>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const db = getFirestore(initializeApp({
+  apiKey:"AIzaSyDv_97PiTPAzdVqvykuYjSM49JgjK2XrH0",
+  authDomain:"disc-veteranas-santfeliu.firebaseapp.com",
+  projectId:"disc-veteranas-santfeliu",
+  storageBucket:"disc-veteranas-santfeliu.firebasestorage.app",
+  messagingSenderId:"500713360539",
+  appId:"1:500713360539:web:1c4e2adb71756a2f4c4a3e"
+}));
+window.FB={
+  savePlayers: async(names)=>{ try{await setDoc(doc(db,"config","equipo"),{players:names});return true;}catch(e){return false;} },
+  loadPlayers: async()=>{ try{const s=await getDoc(doc(db,"config","equipo"));return s.exists()?s.data().players:null;}catch(e){return null;} },
+  saveResult: async(name,scores,primary)=>{ try{await setDoc(doc(db,"resultados",name),{selfScores:scores,selfPrimary:primary});return true;}catch(e){return false;} },
+  saveVotes: async(voter,votes)=>{ try{await setDoc(doc(db,"votos",voter),{votes});return true;}catch(e){return false;} },
+  loadAll: async()=>{
+    try{
+      const [rs,vs]=await Promise.all([getDocs(collection(db,"resultados")),getDocs(collection(db,"votos"))]);
+      const results={},votes={};
+      rs.forEach(d=>results[d.id]=d.data());
+      vs.forEach(d=>votes[d.id]=d.data().votes);
+      return {results,votes};
+    }catch(e){return {results:{},votes:{}};}
+  },
+  subscribe: (cb)=>{
+    const u1=onSnapshot(collection(db,"resultados"),cb);
+    const u2=onSnapshot(collection(db,"votos"),cb);
+    return ()=>{u1();u2();};
+  }
+};
+window._fbReady=true;
+document.dispatchEvent(new Event('fbReady'));
+<\/script>
+
+</head>
+<body>
+<div id="app">
+
+<div class="overlay" id="ov"><div class="spinner"></div><div style="font-size:13px;color:var(--text2)">Conectando...</div></div>
+<div class="toast" id="tst"></div>
+
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-hero">
+    <div class="club-badge">⚽</div>
+    <div class="disc-logo">
+      <div class="dl d">D</div><div class="dl i">I</div>
+      <div class="dl s">S</div><div class="dl c">C</div>
+    </div>
+    <div class="welcome-title">Test DISC · Veteranas</div>
+    <div class="welcome-club">⚽ Peña Recreativa Sant Feliu de Llobregat</div>
+    <div class="welcome-sub">Dos módulos: haz tu propio test DISC y después votad qué color veis en cada compañera.</div>
+    <div class="info-cards">
+      <div class="ic"><div class="n">60</div><div class="l">preguntas</div></div>
+      <div class="ic"><div class="n">4</div><div class="l">colores DISC</div></div>
+      <div class="ic"><div class="n">14</div><div class="l">jugadoras</div></div>
+      <div class="ic"><div class="n">2</div><div class="l">módulos</div></div>
+    </div>
+    <div class="sync-pill"><span class="pulse"></span>Datos compartidos en tiempo real</div>
+    <div class="info-cards" style="margin-bottom:.75rem">
+      <div class="ic"><div class="n" id="stat-total">—</div><div class="l">jugadoras</div></div>
+      <div class="ic"><div class="n" id="stat-done">—</div><div class="l">test completados</div></div>
+    </div>
+    <button class="btn-g" onclick="goSelectPlayer()">🧍 Hacer mi test DISC</button>
+    <button class="btn-sec" onclick="goVotingSetup()">🗳️ Votar a las compañeras</button>
+    <button class="btn-sec" style="font-size:12px;color:var(--text3)" onclick="goAdmin()">🔐 Acceso administradora</button>
+  </div>
+</div>
+
+<!-- SETUP EQUIPO -->
+<div id="screen-setup" class="screen">
+  <div class="sec-title">⚙️ Configura el equipo</div>
+  <div class="sec-sub">Escribe los nombres de todas las jugadoras.</div>
+  <div class="player-list" id="player-list"></div>
+  <button class="btn-add-p" onclick="addPlayer()">+ Añadir jugadora</button>
+  <button class="btn-g" onclick="saveTeam()">Guardar equipo →</button>
+  <button class="btn-sec" style="margin-top:6px" onclick="showScr('welcome')">← Volver</button>
+</div>
+
+<!-- SELECCIÓN JUGADORA PARA TEST -->
+<div id="screen-select-player" class="screen">
+  <div class="sec-title">🧍 ¿Quién hace el test?</div>
+  <div class="sec-sub">Elige tu nombre para que el resultado se guarde en el equipo.</div>
+  <select class="voter-select" id="test-player-select">
+    <option value="">— Selecciona tu nombre —</option>
+  </select>
+  <button class="btn-g" onclick="startAsPlayer()">Empezar el test →</button>
+  <button class="btn-sec" style="margin-top:6px" onclick="showScr('welcome')">← Volver</button>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
+  <div class="quiz-meta">
+    <span class="quiz-counter" id="qcounter">1 / 60</span>
+    <span class="badge" id="sbadge"></span>
+  </div>
+  <div class="qcard">
+    <div class="qemoji" id="qemoji"></div>
+    <div class="qtext" id="qtext"></div>
+  </div>
+  <div class="opts-lbl">¿Con cuál te identificas más?</div>
+  <div class="opts" id="opts"></div>
+  <div class="nav-row">
+    <button class="btn-back" id="btn-back" onclick="prevQ()">←</button>
+    <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>Siguiente</button>
+  </div>
+</div>
+
+<!-- RESULTADO INDIVIDUAL -->
+<div id="screen-result" class="screen">
+  <div class="section-scroll">
+    <div id="res-header" class="res-header"></div>
+    <div class="score-bars" id="res-bars"></div>
+    <div class="dtabs" id="dtabs"></div>
+    <div id="dpanels"></div>
+    <div style="display:flex;gap:8px;margin-top:.75rem;">
+      <button class="btn-g" style="margin-bottom:0" onclick="goVotingSetup()">🗳️ Votar compañeras</button>
+      <button class="btn-sec" style="flex:1" onclick="goTeamResults()">📊 Equipo</button>
+    </div>
+    <button class="btn-sec" style="margin-top:8px" onclick="showScr('welcome')">← Inicio</button>
+  </div>
+</div>
+
+<!-- VOTING SETUP -->
+<div id="screen-voting-setup" class="screen">
+  <div class="sec-title">🗳️ Votar a las compañeras</div>
+  <div class="sec-sub">¿Quién eres tú? Así sabemos quién vota.</div>
+  <select class="voter-select" id="voter-select">
+    <option value="">— Selecciona tu nombre —</option>
+  </select>
+  <button class="btn-g" onclick="startVoting()">Empezar a votar →</button>
+  <button class="btn-sec" style="margin-top:6px" onclick="showScr('welcome')">← Volver</button>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="screen-admin-login" class="screen">
+  <div style="text-align:center;padding:2rem 0 1rem">
+    <div style="font-size:48px;margin-bottom:1rem">🔐</div>
+    <div class="sec-title">Acceso administradora</div>
+    <div class="sec-sub" style="margin-bottom:1.5rem">Solo para la coordinadora del equipo</div>
+    <input type="password" id="admin-pwd" class="player-input" placeholder="Contraseña" style="margin-bottom:1rem;text-align:center;font-size:18px;letter-spacing:4px"
+      onkeydown="if(event.key==='Enter')checkAdmin()">
+    <button class="btn-g" onclick="checkAdmin()">Entrar →</button>
+    <button class="btn-sec" style="margin-top:6px" onclick="showScr('welcome')">← Volver</button>
+  </div>
+</div>
+
+<!-- VOTING -->
+
+<div id="screen-voting" class="screen">
+  <div class="sec-title">🗳️ ¿Qué color ves en cada compañera?</div>
+  <div class="sec-sub" id="voter-label"></div>
+  <div class="vote-prog" id="vote-prog"></div>
+  <div class="section-scroll" id="voting-cards"></div>
+  <button class="btn-g" id="btn-save-votes" onclick="saveVotesAndShow()" disabled style="margin-top:.75rem">Guardar mis votos →</button>
+  <button class="btn-sec" style="margin-top:6px" onclick="goTeamResults()">Ver resultados sin guardar</button>
+</div>
+
+<!-- THANKS -->
+<div id="screen-thanks" class="screen">
+  <div style="text-align:center;padding:3rem 0">
+    <div style="font-size:56px;margin-bottom:1rem">🎉</div>
+    <div class="sec-title" style="font-size:20px;margin-bottom:.5rem">¡Todo guardado!</div>
+    <div class="sec-sub" style="margin-bottom:2rem">Tu test y tus votos están guardados.<br>Los resultados del equipo se revelarán en la cena. ¡Hasta entonces es secreto!</div>
+    <div style="font-size:40px;margin-bottom:1.5rem">⚽</div>
+    <div style="font-size:13px;color:var(--text2);background:var(--sl);color:var(--s);padding:10px 16px;border-radius:var(--radius);font-weight:500">Peña Recreativa Sant Feliu de Llobregat</div>
+  </div>
+  <button class="btn-sec" onclick="showScr('welcome')">← Volver al inicio</button>
+</div>
+
+<!-- TEAM RESULTS -->
+
+<div id="screen-team-results" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+    <div class="sec-title" style="margin-bottom:0">📊 Perfil del equipo</div>
+    <button onclick="goTeamResults()" style="border:none;background:none;cursor:pointer;font-size:20px" title="Actualizar">🔄</button>
+  </div>
+  <div class="sec-sub">Autoperfil vs. cómo os ven las compañeras</div>
+  <div class="section-scroll" id="team-content"></div>
+  <button class="btn-sec" style="margin-top:.75rem" onclick="showScr('welcome')">← Inicio</button>
+  <button class="btn-sec" style="margin-top:6px;font-size:12px;color:var(--text3)" onclick="isAdmin=false;showScr('welcome')">🔒 Cerrar sesión admin</button>
+</div>
+
+</div>
+<script>
+const DISC=['D','I','S','C'];
+const COLORS={D:'#E24B4A',I:'#EF9F27',S:'#1D9E75',C:'#378ADD'};
+const LIGHTS={D:'#FCEBEB',I:'#FAEEDA',S:'#E1F5EE',C:'#E6F1FB'};
+const MIDS={D:'#F09595',I:'#FAC775',S:'#9FE1CB',C:'#85B7EB'};
+const NAMES={D:'Dominante',I:'Influyente',S:'Estable',C:'Concienzuda'};
+const ICONS={D:'🔴',I:'🟡',S:'🟢',C:'🔵'};
+const DESCS={D:'Decidida · Directa · Líder',I:'Energía · Creatividad · Carisma',S:'Leal · Constante · Empática',C:'Analítica · Precisa · Rigurosa'};
+
+const PROFILES={
+  D:{title:'Perfil Dominante — Roja',tagline:'La capitana natural del campo',position:'Delantera o centrocampista box-to-box',
+    description:'Eres la que manda en el campo. Tomas decisiones rápidas, exiges el máximo y no te conformas con el empate. Tu voz se escucha en el vestuario y eso mueve al equipo hacia adelante, aunque a veces incomode.',
+    strengths:['Liderazgo bajo presión','Mentalidad ganadora','Decisión rápida','Empuje en momentos clave'],
+    growth:['Escuchar más a las compañeras','Celebrar el proceso, no solo el gol','No desesperar si el plan falla','Cuidar el tono bajo tensión'],
+    motivation:'Los partidos difíciles, los retos y demostrar que el equipo puede.',
+    fear:'Perder el control del partido o que el equipo se rinda.',
+    communication:'Directa y al grano. Dile el objetivo claro y ella actúa. Sin rodeos.'},
+  I:{title:'Perfil Influyente — Amarilla',tagline:'La energía del vestuario',position:'Extremo o mediapunta creativa',
+    description:'Eres la que levanta el ánimo cuando van perdiendo. Tu energía es contagiosa, tus ideas sorprenden y el vestuario estaría muy apagado sin ti.',
+    strengths:['Motivación del grupo','Creatividad táctica','Comunicación y carisma','Ambiente positivo'],
+    growth:['Constancia en el esfuerzo defensivo','Seguir los acuerdos tácticos','Bajar el ritmo cuando toca','Escuchar los planes de la míster'],
+    motivation:'El juego bonito, el gol de bang y la celebración colectiva.',
+    fear:'Que el ambiente sea tenso o que nadie la escuche.',
+    communication:'Con entusiasmo y contexto emocional. Cuéntale el porqué y verás que se engancha.'},
+  S:{title:'Perfil Estable — Verde',tagline:'El corazón del equipo',position:'Lateral, portera o pivote',
+    description:'Eres la columna vertebral del equipo. Estás en cada entreno, apoyas a quien está lesionada y recuerdas el cumpleaños de todas. Sin ti el equipo no sería un equipo.',
+    strengths:['Fiabilidad absoluta','Empatía y escucha','Cohesión del grupo','Constancia en el tiempo'],
+    growth:['Exigir más para ti misma','Decir lo que piensas aunque incomode','Adaptarte más al cambio','No cargar con todo'],
+    motivation:'El bienestar del grupo, la amistad y que el equipo esté unido.',
+    fear:'Los conflictos internos y los cambios de última hora.',
+    communication:'Con calma y cariño. Necesita sentirse escuchada antes de actuar.'},
+  C:{title:'Perfil Concienzuda — Azul',tagline:'La analista del equipo',position:'Líbero o mediocentro',
+    description:'Has visto el vídeo del rival, anotas los datos del entreno y recuerdas el sistema de la temporada pasada. Tu rigor y precisión elevan el nivel del equipo.',
+    strengths:['Análisis táctico','Atención al detalle','Fiabilidad y rigor','Preparación exhaustiva'],
+    growth:['Decidir aunque no haya certeza total','Soltar el control del resultado','Disfrutar más el partido','Compartir tus análisis al equipo'],
+    motivation:'La mejora continua, el plan bien ejecutado y el partido preparado.',
+    fear:'Cometer un error grave o que la critiquen sin fundamento.',
+    communication:'Con datos y ejemplos concretos. Respetando su proceso. Sin prisas.'}
+};
+
+const questions=[
+{s:'D',e:'🏆',t:'Vais perdiendo 0-1 a 10 minutos del final. ¿Qué haces?',opts:[
+  {t:'Tomo la iniciativa, reorganizo al equipo y exijo más intensidad.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Animo con gritos y energía para que no bajen los brazos.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Apoyo a las que están más nerviosas y mantengo la calma.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Analizo dónde fallamos y propongo un ajuste táctico concreto.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'📢',t:'La míster no está y alguien tiene que dar las instrucciones en el descanso.',opts:[
+  {t:'Tomo la palabra sin dudarlo y digo lo que hay que cambiar.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Propongo ideas con entusiasmo y trato de enganchar a todas.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Escucho lo que dicen todas antes de aportar algo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Señalo los datos del primer tiempo y propongo ajustes.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'⚡',t:'Una rival te está comiendo el terreno en cada jugada. ¿Cómo respondes?',opts:[
+  {t:'Subo la intensidad. No voy a dejar que me domine.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Le meto psicología y la desestabilizo con humor.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Hablo con la compañera más cercana para cubrirla juntas.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Observo sus patrones y adapto mi posición.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🎯',t:'La míster os pide definir un objetivo para esta temporada. Tú propones...',opts:[
+  {t:'Ganar el campeonato. Nada más, nada menos.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Ser el equipo con mejor rollo y ambiente de la liga.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Que ninguna se lesione y todas disfruten de principio a fin.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Mejorar la posesión y reducir los goles encajados.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🥅',t:'Marcas un gol importante. ¿Cómo reaccionas?',opts:[
+  {t:'Celebración intensa y a por el siguiente.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Celebración épica con todo el equipo, gritos y saltos.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Abrazo largo con las que me la pusieron.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Un gesto tranquilo. Lo celebraré cuando ganemos.',w:{D:2,I:0,S:0,C:4}},
+]},
+{s:'D',e:'😤',t:'Una compañera lleva semanas sin esforzarse. ¿Qué haces?',opts:[
+  {t:'Se lo digo directamente. No puede bajar el nivel.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Lo comento con humor para que lo tome bien.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Me acerco en privado para ver si le pasa algo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Lo comento con la míster para que lo gestione.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🔥',t:'Os jugáis el pase a la final. ¿Cómo llegas al partido?',opts:[
+  {t:'Con ganas de ganar y mentalidad de que este partido es mío.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Muy emocionada, con mil conversaciones con las compañeras.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Tranquila y centrada en disfrutar el momento.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Habiendo repasado al rival y con el plan táctico claro.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🚀',t:'El equipo lleva tres partidos sin ganar. ¿Tu reacción?',opts:[
+  {t:'Propongo un entrenamiento extra y exijo más compromiso.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Organizo algo de equipo para levantar el ánimo.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Apoyo a las más bajas y mantengo la unión.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Analizo los tres partidos para encontrar el patrón.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'💬',t:'La míster te pone de lateral cuando siempre juegas de delantera.',opts:[
+  {t:'Se lo digo a la cara. Puedo aportar más arriba.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Le pregunto el motivo y trato de convencerla.',w:{D:2,I:3,S:0,C:1}},
+  {t:'Acepto la decisión y doy el máximo en esa posición.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Pido explicación táctica antes de opinar.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'⏱️',t:'Quedan 5 minutos, empate a 1 y hay un córner a favor.',opts:[
+  {t:'Subo al área aunque no sea mi posición. Hay que arriesgar.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Me pongo en la posición más visible para crear.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Cubro mi zona para asegurar el contragolpe.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Ejecuto exactamente el movimiento acordado.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🏅',t:'¿Qué es para ti ganar un partido?',opts:[
+  {t:'Lo más importante. Para eso entrenamos.',w:{D:4,I:0,S:1,C:1}},
+  {t:'Genial, sobre todo si lo celebramos bien juntas.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Importante, pero más si todas hemos disfrutado.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Importante si es fruto de haber ejecutado bien el plan.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🛡️',t:'El árbitro pita algo muy en contra de vuestro equipo.',opts:[
+  {t:'Le digo lo que pienso, con educación pero sin callarme.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Hago algún comentario con humor para quitar tensión.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Me callo para no enrarecer el partido.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Lo anoto y si hay patrón, lo digo con argumentos.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🧠',t:'En el entrenamiento táctico, tú eres la que...',opts:[
+  {t:'Propone variantes y prueba cosas nuevas por su cuenta.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Pregunta todo y hace el entreno más dinámico.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Sigue indicaciones y ayuda a las que no entienden.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Toma nota mental de cada detalle para ejecutarlo bien.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'💪',t:'¿Cómo defines tu actitud en los partidos difíciles?',opts:[
+  {t:'Nunca me rindo. Cuanto peor va, más me crece.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Trato de mantener la energía alta aunque no salga.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Me centro en dar apoyo y estabilidad al equipo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Busco el error táctico que nos perjudica y lo ajusto.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'D',e:'🎖️',t:'¿Qué palabra te define mejor dentro del campo?',opts:[
+  {t:'Imparable.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Chispa.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Roca.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Cerebro.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🎉',t:'El equipo acaba de ganar el primer partido. ¿Qué propones?',opts:[
+  {t:'Nada especial, hay que mantener los pies en el suelo.',w:{D:4,I:0,S:1,C:1}},
+  {t:'¡Cena de equipo esta noche! Yo me encargo de organizarlo.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Disfrutar el momento juntas en el vestuario.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Revisar lo que salió bien para repetirlo.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'📱',t:'En el grupo de WhatsApp del equipo, tú eres la que...',opts:[
+  {t:'Pone los mensajes más cortos y directos.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Pone los memes y sube el ánimo cuando el grupo está muerto.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Responde a todo el mundo y cuida que nadie se sienta ignorado.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Solo escribe cuando tiene algo relevante que decir.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🗣️',t:'Antes de un partido importante, ¿qué haces en el vestuario?',opts:[
+  {t:'Doy un discurso corto y directo para centrar al equipo.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Pongo la música, bailo y subo la energía de todas.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Hablo con cada compañera para que estén bien.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Repaso mentalmente el plan táctico en silencio.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🌟',t:'La míster pide voluntarias para presentar el equipo en un evento de la peña.',opts:[
+  {t:'Me apunto si es estratégico para el equipo.',w:{D:4,I:0,S:0,C:2}},
+  {t:'¡Soy la primera! Me encanta este tipo de cosas.',w:{D:0,I:4,S:0,C:1}},
+  {t:'Me apunto si hace falta, aunque no sea lo mío.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Me apunto si me dan tiempo para prepararlo bien.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🤝',t:'Llega una jugadora nueva al equipo. ¿Qué haces?',opts:[
+  {t:'Le explico directamente cómo funciona y qué se espera.',w:{D:4,I:1,S:0,C:1}},
+  {t:'La presento a todas, la incluyo en los planes y la hago sentir una más.',w:{D:0,I:4,S:1,C:1}},
+  {t:'La acompaño con calma y le doy tiempo para adaptarse.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Le explico los sistemas y dinámicas del equipo con detalle.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'😂',t:'Hay mucha tensión en el entrenamiento. ¿Cómo lo gestionas?',opts:[
+  {t:'Digo lo que pienso y propongo solucionar el problema.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Rompo el hielo con un comentario divertido o una propuesta loca.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Me acerco a las más tensas para apoyarlas.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Observo antes de intervenir para no empeorar.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🏃',t:'¿Cómo describes tu estilo dentro del campo?',opts:[
+  {t:'Intensa, vertical y buscando siempre el gol.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Creativa, improvisadora y con un punto de sorpresa.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Constante, solidaria y siempre donde el equipo me necesita.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Ordenada, posicional y atenta a los movimientos tácticos.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🔊',t:'El equipo ha cometido un fallo colectivo importante.',opts:[
+  {t:'Digo lo que ha salido mal sin rodeos para que no se repita.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Lo quito importancia con humor y las animo a seguir.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Apoyo a las que se han sentido más responsables.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Analizo qué salió mal y propongo cómo corregirlo.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🎶',t:'¿Qué música pones en el bus camino al partido?',opts:[
+  {t:'La que sea, lo importante es llegar centradas.',w:{D:4,I:0,S:1,C:1}},
+  {t:'La playlist de motivación que tengo preparada. ¡Yo me encargo!',w:{D:0,I:4,S:1,C:0}},
+  {t:'La que quiera la mayoría. Que todas estén a gusto.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Prefiero silencio para concentrarme.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🌈',t:'¿Qué es lo que más disfrutas del equipo fuera del campo?',opts:[
+  {t:'Los logros y los retos que conseguimos juntas.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Las risas, las cenas y las historias que compartimos.',w:{D:0,I:4,S:1,C:1}},
+  {t:'El vínculo especial que se crea con el tiempo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'La organización y el crecimiento como equipo.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🙌',t:'Una compañera está nerviosa antes de jugar por primera vez de titular.',opts:[
+  {t:'Le digo que confíe en ella y que salga a ganar.',w:{D:4,I:0,S:0,C:2}},
+  {t:'La lleno de energía, le digo que va a brillar y la hago reír.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Le doy un abrazo y la tranquilizo con calma.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Le recuerdo el plan táctico y sus responsabilidades.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'📣',t:'¿Cómo animas desde el banquillo cuando no juegas?',opts:[
+  {t:'Doy instrucciones concretas a las que están dentro.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Animo con todo: gritos, aplausos y energía máxima.',w:{D:0,I:4,S:1,C:0}},
+  {t:'Apoyo en silencio y estoy atenta para cuando me necesiten.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Observo el partido para aprender y dar feedback después.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'I',e:'🎊',t:'¿Qué es lo más importante para ti en el equipo?',opts:[
+  {t:'Ganar y conseguir los objetivos marcados.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Que haya buena energía, risas y buen rollo.',w:{D:0,I:4,S:1,C:1}},
+  {t:'La confianza, la lealtad y el apoyo mutuo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Que trabajemos con rigor y se note la preparación.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'I',e:'💫',t:'¿Cómo reaccionas cuando una compañera hace una jugada brillante?',opts:[
+  {t:'Un gesto de aprobación y a seguir. Hay que mantener el foco.',w:{D:4,I:0,S:1,C:1}},
+  {t:'¡La celebro a lo grande! Grito y la hago sentir una estrella.',w:{D:0,I:4,S:1,C:0}},
+  {t:'La felicito con un abrazo sincero y le digo lo orgullosa que estoy.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Lo anoto mentalmente como referencia para el equipo.',w:{D:1,I:0,S:0,C:4}},
+]},
+{s:'S',e:'❤️',t:'Una compañera está pasando un momento difícil y falla en los entrenos.',opts:[
+  {t:'Se lo digo claramente: el equipo necesita que esté al 100%.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Le propongo hacer algo juntas para levantarle el ánimo.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Le pregunto cómo está y le digo que cuenta conmigo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Hablo con la míster para que gestione la situación.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🤲',t:'El equipo tiene que votar si jugar un torneo extra en verano.',opts:[
+  {t:'Voto según lo que yo quiero hacer, sin rodeos.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Propongo convertirlo en un fin de semana de equipo completo.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Me adapto a la decisión de la mayoría para no romper la unión.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Pido información sobre fechas y costes antes de votar.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🏥',t:'Te lesionas y tienes que estar fuera varias semanas.',opts:[
+  {t:'Hago rehabilitación intensiva para volver lo antes posible.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Sigo yendo a los partidos y animo al equipo desde fuera.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Lo paso mal, sobre todo por no poder estar con las compañeras.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Sigo los entrenos desde fuera y tomo notas para cuando vuelva.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🤝',t:'Hay tensión entre dos compañeras que afecta al equipo.',opts:[
+  {t:'Les digo directamente que lo solucionen.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Organizo algo de equipo para que se relacionen en otro contexto.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Hablo con cada una por separado y trato de acercar posturas.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Observo la situación y busco la causa real del conflicto.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'📅',t:'¿Con qué frecuencia faltas a los entrenamientos?',opts:[
+  {t:'Cuando no tengo tiempo o hay una razón importante.',w:{D:4,I:1,S:0,C:1}},
+  {t:'A veces, cuando surge algo mejor o estoy muy cansada.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Casi nunca. El equipo cuenta conmigo y no quiero fallar.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Solo si es estrictamente necesario.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🌧️',t:'El partido de hoy es en un campo en muy malas condiciones.',opts:[
+  {t:'Ni me importa. Estoy aquí para ganar.',w:{D:4,I:0,S:0,C:2}},
+  {t:'¡Esto va a ser épico! Más motivada todavía.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Me adapto sin quejarme. Si todas estamos, yo también.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Ajusto mi juego mentalmente a las condiciones del terreno.',w:{D:1,I:0,S:1,C:4}},
+]},
+{s:'S',e:'👂',t:'En el vestuario, ¿quién suele pedir tu opinión cuando hay un problema?',opts:[
+  {t:'Las que quieren que alguien tome decisiones.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Las que quieren energía positiva y nuevas ideas.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Casi todas, porque saben que las escucho sin juzgar.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Las que quieren un análisis objetivo.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🤗',t:'¿Qué papel juegas en el vestuario del equipo?',opts:[
+  {t:'La que pone orden y dice lo que hay que decir.',w:{D:4,I:0,S:0,C:2}},
+  {t:'La que anima, hace reír y sube la energía de todas.',w:{D:0,I:4,S:1,C:0}},
+  {t:'La que escucha, ayuda y hace que todas se sientan bien.',w:{D:0,I:1,S:4,C:1}},
+  {t:'La que analiza, prepara y aporta información útil.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🏡',t:'¿Qué valoras más de pertenecer a este equipo de la peña?',opts:[
+  {t:'Los retos deportivos y la competición.',w:{D:4,I:1,S:0,C:1}},
+  {t:'El buen rollo, las risas y los momentos únicos.',w:{D:0,I:4,S:1,C:1}},
+  {t:'El sentido de pertenencia y la amistad que dura años.',w:{D:0,I:1,S:4,C:1}},
+  {t:'El crecimiento personal y la organización seria del club.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'💞',t:'Una compañera veterana habla de dejar el equipo.',opts:[
+  {t:'Le pregunto sus razones y le digo lo que aporta al equipo.',w:{D:4,I:0,S:0,C:2}},
+  {t:'La convenzo con entusiasmo de que se quede.',w:{D:0,I:4,S:1,C:1}},
+  {t:'La escucho sin presionarla y le digo que siempre tendrá mi apoyo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Le pregunto qué necesitaría para quedarse y analizo si es posible.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🔄',t:'La míster cambia el sistema táctico de golpe a mitad de temporada.',opts:[
+  {t:'Lo acepto si tiene resultados, lo cuestiono si no los tiene.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Lo vivo como un reto nuevo y me adapto con energía.',w:{D:0,I:4,S:0,C:1}},
+  {t:'Me cuesta, pero confío en el proceso y en la míster.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Necesito entender el porqué antes de ejecutarlo con confianza.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🕊️',t:'¿Cómo describes tu relación con las compañeras del equipo?',opts:[
+  {t:'Profesional y directa. Somos compañeras, no amigas íntimas.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Muy buena, animada y llena de momentos divertidos.',w:{D:0,I:4,S:1,C:0}},
+  {t:'Profunda y leal. Son como una segunda familia.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Correcta y respetuosa, basada en la confianza y el trabajo.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'S',e:'🌱',t:'¿Qué es lo que más te ha costado como jugadora veterana?',opts:[
+  {t:'Aceptar los límites físicos y adaptarme a ellos.',w:{D:4,I:0,S:1,C:1}},
+  {t:'Mantener la misma ilusión y energía que tenía al empezar.',w:{D:0,I:4,S:0,C:1}},
+  {t:'Ver cómo compañeras con las que empecé van dejando el equipo.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Que mi cuerpo no responde como mi cabeza planifica.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'C',e:'📊',t:'Antes de un partido, ¿qué información te gusta tener sobre el rival?',opts:[
+  {t:'Sus puntos débiles y cómo explotarlos. Nada más.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Algo general para tener contexto, sin obsesionarme.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Lo que nos ayude a prepararnos sin generar ansiedad.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Todo lo posible: sistema, jugadoras clave, estadísticas.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'📋',t:'Después de un partido que habéis perdido, tú...',opts:[
+  {t:'Quiero pasar página rápido y centrarme en el siguiente.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Propongo algo de equipo para cerrar bien y volver con energía.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Me aseguro de que todas estén bien emocionalmente.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Analizo qué falló y lo preparo para comentarlo en el entreno.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🔍',t:'¿Cómo te preparas para los entrenamientos?',opts:[
+  {t:'Llego con energía. La preparación es en el campo.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Llego con buena actitud y ganas de que sea dinámico.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Me aseguro de llegar descansada y de buen humor.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Repaso los puntos de mejora del entreno anterior.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'C',e:'⚙️',t:'La míster os pide aprender una jugada a balón parado nueva.',opts:[
+  {t:'La ejecuto rápido y si no funciona, cambiamos sobre la marcha.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Propongo variantes más creativas y dinámicas.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Me aprendo mi rol y ayudo a las que no lo tienen claro.',w:{D:0,I:1,S:4,C:1}},
+  {t:'La estudio en detalle hasta tenerla perfectamente memorizada.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'📏',t:'¿Qué opinas de los errores en el juego?',opts:[
+  {t:'Son parte del juego. Lo importante es no dejar que te afecten.',w:{D:4,I:1,S:0,C:1}},
+  {t:'Se superan con energía y actitud positiva.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Hay que perdonárselos y apoyar a quien los comete.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Son información valiosa: hay que analizarlos para no repetirlos.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🗺️',t:'¿Cómo participas en la definición del sistema de juego?',opts:[
+  {t:'Propongo el sistema que creo que da más opciones de ganar.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Aporto ideas creativas y me entusiasmo con las posibilidades.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Apoyo el sistema que mejor funcione para el conjunto.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Analizo los pros y contras de cada opción antes de opinar.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🧩',t:'¿Cómo reaccionas cuando la táctica del partido no funciona?',opts:[
+  {t:'Tomo la iniciativa y propongo un cambio sin esperar.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Animo al equipo para que no se desmoralice.',w:{D:0,I:4,S:1,C:1}},
+  {t:'Apoyo a la míster y confío en que encontrará la solución.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Identifico el problema específico y lo comunico con datos.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'📝',t:'¿Llevas algún tipo de registro de tu rendimiento o el del equipo?',opts:[
+  {t:'No. Lo que importa es el resultado final.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Mentalmente sí, pero confío en mi intuición.',w:{D:1,I:4,S:1,C:0}},
+  {t:'Solo si sirve para ayudar al equipo a mejorar.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Sí, anoto cosas después de los partidos y entrenos.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🎓',t:'Cuando la míster explica algo táctico, tú...',opts:[
+  {t:'Escucho lo esencial y ya lo aplico en el campo.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Escucho y hago preguntas para enriquecer la explicación.',w:{D:1,I:4,S:0,C:1}},
+  {t:'Escucho con atención y me aseguro de que todas lo hayan entendido.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Escucho, tomo notas y pido aclaraciones si algo no cuadra.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🔧',t:'El equipo tiene una debilidad táctica clara. ¿Cómo lo abordas?',opts:[
+  {t:'Lo digo directamente y propongo una solución inmediata.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Propongo trabajarlo de una forma dinámica y motivadora.',w:{D:0,I:4,S:0,C:1}},
+  {t:'Lo comento con la míster con calma para no alarmar.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Preparo un análisis detallado y propuestas de mejora.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'⏰',t:'¿Cómo llegas normalmente a los entrenamientos?',opts:[
+  {t:'Puntual o con muy poco margen. Voy al grano.',w:{D:4,I:0,S:0,C:2}},
+  {t:'A veces tarde, pero siempre con mucha energía.',w:{D:0,I:4,S:0,C:1}},
+  {t:'Con tiempo. No quiero hacer esperar a nadie.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Siempre con antelación. Me gusta calentar bien.',w:{D:0,I:0,S:1,C:4}},
+]},
+{s:'C',e:'🧠',t:'¿Qué es lo que más valoras en una míster?',opts:[
+  {t:'Que sepa tomar decisiones difíciles y marcar el camino.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Que tenga energía, creatividad y sepa motivar al grupo.',w:{D:0,I:4,S:1,C:0}},
+  {t:'Que cuide a las personas y cree un ambiente de confianza.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Que sea rigurosa tácticamente y tenga un plan claro.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🌟',t:'¿Cómo defines una temporada perfecta para ti?',opts:[
+  {t:'Haber ganado el campeonato y marcado los goles clave.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Haber vivido momentos increíbles dentro y fuera del campo.',w:{D:0,I:4,S:1,C:0}},
+  {t:'Haber mantenido al equipo unido y a todas disfrutando.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Haber mejorado como equipo en cada aspecto medible.',w:{D:0,I:0,S:0,C:4}},
+]},
+{s:'C',e:'🎯',t:'¿Qué te llevas al terminar cada partido, ganes o pierdas?',opts:[
+  {t:'La sensación de si di el máximo o no.',w:{D:4,I:0,S:0,C:2}},
+  {t:'Los momentos de conexión y diversión con las compañeras.',w:{D:0,I:4,S:1,C:0}},
+  {t:'Saber que el equipo estuvo unido y nadie se quedó sola.',w:{D:0,I:1,S:4,C:1}},
+  {t:'Un análisis claro de lo que salió bien y lo que mejorar.',w:{D:0,I:0,S:0,C:4}},
+]},
+];
+
+// ==================== STATE ====================
+let players=[];
+let teamVotes={};
+let currentVoter=null;
+let cur=0,ans=new Array(60).fill(null),currentPlayer=null;
+
+// ==================== SCREENS ====================
+function showScr(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+
+// ==================== SETUP ====================
+function goSelectPlayer(){
+  if(players.length===0){goSetup();return;}
+  populateSelects();
+  showScr('select-player');
+}
+
+function goSetup(){
+  if(players.length===0){
+    players=['Laura','Marta','Ana','Carla','Sofia','Elena','Paula','Nuria','Lucia','Sara','Maria','Claudia','Irene','Rosa']
+      .map(n=>({name:n,selfScores:null,selfPrimary:null}));
+  }
+  renderPList();showScr('setup');
+}
+
+function renderPList(){
+  document.getElementById('player-list').innerHTML=players.map((p,i)=>`
+    <div class="player-row">
+      <span class="player-num">${i+1}</span>
+      <input class="player-input" value="${p.name}" oninput="players[${i}].name=this.value" placeholder="Nombre jugadora">
+      ${players.length>2?`<button class="btn-del" onclick="removeP(${i})">×</button>`:'<div style="width:32px"></div>'}
+    </div>
+  `).join('');
+}
+
+function addPlayer(){
+  if(players.length<20){players.push({name:'',selfScores:null,selfPrimary:null});renderPList();}
+}
+function removeP(i){players.splice(i,1);renderPList();}
+
+function saveTeam(){
+  players=players.filter(p=>p.name.trim()!=='');
+  if(players.length<2){alert('Añade al menos 2 jugadoras.');return;}
+  populateSelects();
+  showScr('select-player');
+}
+
+function populateSelects(){
+  ['test-player-select','voter-select'].forEach(id=>{
+    const s=document.getElementById(id);
+    s.innerHTML='<option value="">— Selecciona tu nombre —</option>'+
+      players.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+  });
+}
+
+function startAsPlayer(){
+  const v=document.getElementById('test-player-select').value;
+  if(!v){alert('Selecciona tu nombre.');return;}
+  currentPlayer=v;cur=0;ans=new Array(60).fill(null);
+  renderQ();showScr('quiz');
+}
+
+// ==================== QUIZ ====================
+const SDATA={D:{name:'Dominante',color:'#E24B4A',bg:'#FCEBEB'},I:{name:'Influyente',color:'#EF9F27',bg:'#FAEEDA'},S:{name:'Estable',color:'#1D9E75',bg:'#E1F5EE'},C:{name:'Concienzuda',color:'#378ADD',bg:'#E6F1FB'}};
+
+function renderQ(){
+  const q=questions[cur];const sec=SDATA[q.s];
+  const pct=((cur+1)/60)*100;
+  document.getElementById('pfill').style.cssText=`width:${pct}%;background:${sec.color}`;
+  document.getElementById('qcounter').textContent=(cur+1)+' / 60';
+  const b=document.getElementById('sbadge');
+  b.textContent=sec.name;b.style.background=sec.bg;b.style.color=sec.color;
+  document.getElementById('qemoji').textContent=q.e;
+  document.getElementById('qtext').textContent=q.t;
+  const g=document.getElementById('opts');g.innerHTML='';
+  ['A','B','C','D'].forEach((lbl,i)=>{
+    const btn=document.createElement('button');btn.className='obt';
+    btn.innerHTML=`<div class="ot"><strong>${lbl}.</strong> ${q.opts[i].t}</div>`;
+    if(ans[cur]===i){btn.classList.add('sel');btn.style.borderColor=sec.color;btn.style.background=sec.bg;}
+    btn.onclick=()=>selOpt(i);g.appendChild(btn);
+  });
+  const bn=document.getElementById('btn-next');
+  bn.disabled=ans[cur]===null;
+  bn.textContent=cur===59?'¡Ver mi perfil!':'Siguiente →';
+  document.getElementById('btn-back').style.visibility=cur===0?'hidden':'visible';
+}
+
+function selOpt(i){
+  ans[cur]=i;const q=questions[cur];const sec=SDATA[q.s];
+  document.querySelectorAll('.obt').forEach((b,idx)=>{
+    b.classList.remove('sel');b.style.borderColor='';b.style.background='';
+    if(idx===i){b.classList.add('sel');b.style.borderColor=sec.color;b.style.background=sec.bg;}
+  });
+  document.getElementById('btn-next').disabled=false;
+}
+function nextQ(){if(ans[cur]===null)return;if(cur===59){showIndResult();return;}cur++;renderQ();}
+function prevQ(){if(cur===0)return;cur--;renderQ();}
+
+// ==================== INDIVIDUAL RESULT ====================
+function calcSc(){
+  const sc={D:0,I:0,S:0,C:0};
+  questions.forEach((q,qi)=>{if(ans[qi]!==null){const w=q.opts[ans[qi]].w;DISC.forEach(d=>sc[d]+=w[d]);}});
+  return sc;
+}
+
+async function showIndResult(){
+  const sc=calcSc();
+  const total=DISC.reduce((s,d)=>s+sc[d],0);
+  const pcts={};DISC.forEach(d=>pcts[d]=total>0?Math.round(sc[d]/total*100):0);
+  const primary=DISC.reduce((a,b)=>sc[a]>=sc[b]?a:b);
+  if(currentPlayer){
+    ov(true);
+    await window.FB.saveResult(currentPlayer,sc,primary);
+    ov(false);
+    toast('Resultado guardado para el equipo');
+    const p=players.find(pp=>pp.name===currentPlayer);
+    if(p){p.selfScores=sc;p.selfPrimary=primary;}
+    updStats();
+  }
+  const prof=PROFILES[primary];
+  document.getElementById('res-header').innerHTML=`
+    <div class="res-circle" style="background:${LIGHTS[primary]};color:${COLORS[primary]};border:2px solid ${MIDS[primary]}">${primary}</div>
+    <div class="res-title" style="color:${COLORS[primary]}">${prof.title}</div>
+    <div class="res-sub">${prof.tagline}</div>
+    <div style="margin-top:7px;font-size:11px;font-weight:500;background:${LIGHTS[primary]};color:${COLORS[primary]};padding:3px 12px;border-radius:20px;display:inline-block">Posición ideal: ${prof.position}</div>
+  `;
+  document.getElementById('res-bars').innerHTML=DISC.map(d=>`
+    <div class="srow">
+      <div class="slabel" style="color:${COLORS[d]}">${ICONS[d]} ${NAMES[d]}</div>
+      <div class="strack"><div class="sfill" id="sf-${d}" style="width:0%;background:${COLORS[d]}"></div></div>
+      <div class="spct">${pcts[d]}%</div>
+    </div>
+  `).join('');
+  setTimeout(()=>DISC.forEach(d=>{const el=document.getElementById('sf-'+d);if(el)el.style.width=pcts[d]+'%';}),100);
+
+  const tabs=[{id:'ov',l:'Perfil'},{id:'st',l:'Fortalezas'},{id:'gr',l:'Mejora'},{id:'co',l:'Compañeras'}];
+  document.getElementById('dtabs').innerHTML=tabs.map((t,i)=>`
+    <button class="dtab ${i===0?'active':''}" style="${i===0?`border-color:${COLORS[primary]};color:${COLORS[primary]};`:''}"
+      onclick="swTab('${t.id}','${primary}',this)">${t.l}</button>
+  `).join('');
+  document.getElementById('dpanels').innerHTML=`
+    <div id="p-ov" class="dpanel active">
+      <div class="pcard"><h3>Tu perfil en el equipo</h3><p>${prof.description}</p></div>
+      <div class="pcard"><h3>Qué te motiva</h3><p>${prof.motivation}</p></div>
+      <div class="pcard"><h3>Tu mayor reto</h3><p>${prof.fear}</p></div>
+    </div>
+    <div id="p-st" class="dpanel">
+      <div class="traits">${prof.strengths.map(s=>`<div class="tpill" style="background:${LIGHTS[primary]};color:${COLORS[primary]}">${s}</div>`).join('')}</div>
+      <div class="pcard"><h3>Posición ideal</h3><p>${prof.position}</p></div>
+    </div>
+    <div id="p-gr" class="dpanel">
+      <div class="pcard"><h3>Áreas de crecimiento</h3>${prof.growth.map(g=>`<p style="margin-bottom:5px">• ${g}</p>`).join('')}</div>
+    </div>
+    <div id="p-co" class="dpanel">
+      <div class="pcard"><h3>Cómo comunicarte con cada compañera</h3>
+        ${DISC.filter(d=>d!==primary).map(d=>`<p style="margin-bottom:9px"><strong style="color:${COLORS[d]}">${ICONS[d]} ${NAMES[d]}:</strong><br><span style="font-size:12px">${getTip(primary,d)}</span></p>`).join('')}
+      </div>
+      <div class="pcard"><h3>Cómo comunicarse contigo</h3><p>${prof.communication}</p></div>
+    </div>
+  `;
+  showScr('result');
+}
+
+function swTab(id,primary,el){
+  document.querySelectorAll('.dtab').forEach(b=>{b.classList.remove('active');b.style.borderColor='';b.style.color='';});
+  el.classList.add('active');el.style.borderColor=COLORS[primary];el.style.color=COLORS[primary];
+  document.querySelectorAll('.dpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+}
+
+// ==================== VOTING ====================
+function goVotingSetup(){
+  if(players.length===0){alert('Primero configura el equipo desde el menú principal.');return;}
+  populateSelects();
+  if(currentPlayer)document.getElementById('voter-select').value=currentPlayer;
+  showScr('voting-setup');
+}
+
+function startVoting(){
+  const voter=document.getElementById('voter-select').value;
+  if(!voter){alert('Selecciona tu nombre.');return;}
+  const others=players.filter(p=>p.name!==voter);
+  if(others.length===0){alert('No hay otras jugadoras para votar.');return;}
+  if(!teamVotes[voter])teamVotes[voter]={};
+  currentVoter=voter;
+  document.getElementById('voter-label').textContent=`Hola ${voter} — elige el color DISC que mejor describe a cada compañera.`;
+  renderVCards(voter,others);
+  updateVProg(voter,others);
+  showScr('voting');
+}
+
+function renderVCards(voter,others){
+  document.getElementById('voting-cards').innerHTML=others.map(p=>`
+    <div class="vcard">
+      <div class="vcard-name">👤 ${p.name}${p.selfPrimary?` <span style="font-size:11px;font-weight:400;color:${COLORS[p.selfPrimary]}">· Autoperfil: ${p.selfPrimary}</span>`:''}</div>
+      <div class="color-opts">
+        ${DISC.map(d=>{
+          const sel=teamVotes[voter][p.name]===d;
+          return `<div class="copt ${sel?'sel':''}" id="co-${esc(p.name)}-${d}"
+            style="${sel?`border-color:${COLORS[d]};background:${LIGHTS[d]};`:''}"
+            onclick="castV('${voter}','${p.name}','${d}')">
+            <span class="cletter" style="color:${COLORS[d]}">${d}</span>
+            <span class="cname" style="color:${COLORS[d]}">${NAMES[d]}</span>
+            <span class="cdesc">${DESCS[d]}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function esc(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
+
+function castV(voter,target,disc){
+  if(!teamVotes[voter])teamVotes[voter]={};
+  teamVotes[voter][target]=disc;
+  const others=players.filter(p=>p.name!==voter);
+  DISC.forEach(d=>{
+    const el=document.getElementById('co-'+esc(target)+'-'+d);
+    if(!el)return;
+    el.classList.remove('sel');el.style.borderColor='';el.style.background='';
+    if(d===disc){el.classList.add('sel');el.style.borderColor=COLORS[d];el.style.background=LIGHTS[d];}
+  });
+  updateVProg(voter,others);
+}
+
+function updateVProg(voter,others){
+  const voted=others.filter(p=>teamVotes[voter]&&teamVotes[voter][p.name]).length;
+  document.getElementById('vote-prog').textContent=`Has votado ${voted} de ${others.length} compañeras`;
+  document.getElementById('btn-save-votes').disabled=voted<others.length;
+}
+
+async function saveVotesAndShow(){
+  if(currentVoter){
+    ov(true);
+    await window.FB.saveVotes(currentVoter,teamVotes[currentVoter]);
+    ov(false);
+    toast('Votos guardados');
+    await fbRefresh();
+  }
+  showScr('thanks');
+}
+async function goTeamResults(){
+  if(!isAdmin){goAdmin();return;}
+  ov(true);await fbRefresh();ov(false);
+  renderTeamContent();showScr('team-results');
+}
+
+// ==================== TEAM RESULTS ====================
+function renderTeamContent(){
+  const c=document.getElementById('team-content');
+  if(players.length===0){c.innerHTML='<div class="pcard"><p>Primero configura el equipo.</p></div>';return;}
+  let html='';
+  players.forEach(p=>{
+    const recv={D:0,I:0,S:0,C:0};let tv=0;
+    Object.entries(teamVotes).forEach(([vtr,vs])=>{if(vtr!==p.name&&vs[p.name]){recv[vs[p.name]]++;tv++;}});
+    const vPri=tv>0?DISC.reduce((a,b)=>recv[a]>=recv[b]?a:b):null;
+    const hasSelf=!!p.selfPrimary;
+    let sp=null;
+    if(hasSelf&&p.selfScores){
+      const tot=DISC.reduce((s,d)=>s+p.selfScores[d],0)||1;
+      sp={};DISC.forEach(d=>sp[d]=Math.round(p.selfScores[d]/tot*100));
+    }
+    html+=`<div class="tpc">
+      <div class="tpc-header">
+        <div class="tpc-avatar" style="background:${hasSelf?LIGHTS[p.selfPrimary]:'#f5f5f7'};color:${hasSelf?COLORS[p.selfPrimary]:'#aeaeb2'}">${hasSelf?p.selfPrimary:'?'}</div>
+        <div>
+          <div class="tpc-name">${p.name}</div>
+          ${hasSelf?`<span class="tpc-badge" style="background:${LIGHTS[p.selfPrimary]};color:${COLORS[p.selfPrimary]}">Autoperfil: ${NAMES[p.selfPrimary]}</span>`:`<span class="tpc-badge" style="background:#f5f5f7;color:#aeaeb2">Sin test</span>`}
+        </div>
+      </div>`;
+    if(sp){
+      html+=`<div class="mini-bars">${DISC.map(d=>`
+        <div class="mrow">
+          <div class="mlabel" style="color:${COLORS[d]}">${ICONS[d]} ${NAMES[d]}</div>
+          <div class="mtrack"><div class="mfill" style="width:${sp[d]}%;background:${COLORS[d]}"></div></div>
+          <div class="mpct">${sp[d]}%</div>
+        </div>`).join('')}</div>`;
+    }
+    if(tv>0){
+      html+=`<div class="votes-section">
+        <div class="votes-label">🗳️ Cómo la ven las compañeras (${tv} voto${tv>1?'s':''})</div>
+        <div class="vote-chips">${DISC.map(d=>recv[d]>0?`<span class="vchip" style="background:${LIGHTS[d]};color:${COLORS[d]}">${ICONS[d]} ${recv[d]} voto${recv[d]>1?'s':''}</span>`:'').join('')}</div>
+        ${vPri?`<div style="font-size:12px;color:${COLORS[vPri]};font-weight:600">Percepción del equipo: ${NAMES[vPri]}</div>`:''}
+        ${hasSelf&&vPri&&p.selfPrimary!==vPri?`<div class="match-note" style="color:#6e6e73">💡 Ella se ve como <strong style="color:${COLORS[p.selfPrimary]}">${NAMES[p.selfPrimary]}</strong>, el equipo la ve <strong style="color:${COLORS[vPri]}">${NAMES[vPri]}</strong></div>`:''}
+        ${hasSelf&&vPri&&p.selfPrimary===vPri?`<div class="match-note" style="color:${COLORS[vPri]}">✅ Autoperfil y percepción del equipo coinciden</div>`:''}
+      </div>`;
+    }else{
+      html+=`<div style="margin-top:8px;font-size:12px;color:#aeaeb2">Aún no hay votos de las compañeras</div>`;
+    }
+    html+=`</div>`;
+  });
+
+  // Team distribution
+  const withSelf=players.filter(p=>p.selfPrimary);
+  if(withSelf.length>0){
+    const dist={D:0,I:0,S:0,C:0};
+    withSelf.forEach(p=>dist[p.selfPrimary]++);
+    html+=`<div class="pcard">
+      <h3>🏟️ Distribución del equipo</h3>
+      <div class="dist-grid">${DISC.filter(d=>dist[d]>0).map(d=>`
+        <div class="dist-cell" style="background:${LIGHTS[d]}">
+          <div class="dc-letter" style="color:${COLORS[d]}">${d}</div>
+          <div class="dc-count" style="color:${COLORS[d]}">${dist[d]} jug.</div>
+        </div>`).join('')}</div>
+    </div>`;
+  }
+  c.innerHTML=html;
+}
+
+function getTip(f,t){
+  const tips={'D-I':'Dale contexto emocional y celebra sus ideas. Necesita sentir que la escuchas.','D-S':'Baja la intensidad. Escúchala de verdad antes de proponer soluciones.','D-C':'Trae datos y razones claras. No esperes que actúe sin entender el porqué.','I-D':'Ve al grano y muéstrale el impacto concreto. Objetivo, acción, resultado.','I-S':'Sé constante y dale tiempo. Valora su lealtad; no necesita espectáculo, sino presencia.','I-C':'Sé más precisa y estructura tus ideas. Respeta su necesidad de analizar.','S-D':'Sé más directa y habla de lo que quieres. No esperes a que lo adivine.','S-I':'Participa más activamente. Tu aportación vale mucho aunque no la impongas.','S-C':'Dale tiempo y datos. No la presiones a decidir sin la información que necesita.','C-D':'Comunica con más rapidez. Ella quiere acción, no análisis interminable.','C-I':'Sé más expresiva y espontánea. Celebra con ella y comparte tus emociones.','C-S':'Cuida el vínculo humano. Pregúntale cómo está antes de hablar de táctica.'};
+  return tips[f+'-'+t]||'Adapta tu ritmo y estilo a sus necesidades.';
+}
+</script>
+</body>
+</html>
