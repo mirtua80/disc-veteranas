@@ -32,6 +32,22 @@ window.FB={
     const u1=db.collection('resultados').onSnapshot(()=>cb());
     const u2=db.collection('votos').onSnapshot(()=>cb());
     return()=>{u1();u2();};
+  },
+  deleteVote:async(voter)=>{
+    try{await db.collection('votos').doc(voter).delete();return true;}catch(e){return false;}
+  },
+  deleteResult:async(name)=>{
+    try{await db.collection('resultados').doc(name).delete();return true;}catch(e){return false;}
+  },
+  resetAll:async()=>{
+    try{
+      const[rs,vs]=await Promise.all([db.collection('resultados').get(),db.collection('votos').get()]);
+      const batch=db.batch();
+      rs.forEach(d=>batch.delete(d.ref));
+      vs.forEach(d=>batch.delete(d.ref));
+      await batch.commit();
+      return true;
+    }catch(e){return false;}
   }
 };
 window._fbReady=true;
@@ -311,6 +327,7 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
     <button onclick="refreshAdmin()" style="border:none;background:none;cursor:pointer;font-size:22px">🔄</button>
   </div>
   <div class="ssub">Veteranas Sant Feliu de Llobregat</div>
+  <button onclick="resetAll()" style="width:100%;padding:12px;background:#FCEBEB;color:#E24B4A;border:1.5px solid #F09595;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px">🗑️ Resetear todos los datos</button>
   <div class="scroll" id="admin-content"></div>
   <button class="btn-s" style="margin-top:.75rem" onclick="isAdmin=false;showScr('welcome')">🔒 Cerrar sesión</button>
 </div>
@@ -846,7 +863,10 @@ function renderAdminStats(){
       <div class="status-row">
         <span class="status-name">${p.name}</span>
         ${p.selfPrimary
-          ? `<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:${LIGHTS[p.selfPrimary]};color:${COLORS[p.selfPrimary]}">${ICONS[p.selfPrimary]} ${p.selfPrimary} · ${NAMES[p.selfPrimary]}</span>`
+          ? `<div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:${LIGHTS[p.selfPrimary]};color:${COLORS[p.selfPrimary]}">${ICONS[p.selfPrimary]} ${p.selfPrimary}</span>
+              <button onclick="deleteResult('${p.name}')" style="border:none;background:var(--dl);color:var(--d);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer">🗑️</button>
+            </div>`
           : `<span style="font-size:12px;color:var(--text3)">⏳ Pendiente</span>`}
       </div>`).join('')}
   </div>`;
@@ -861,7 +881,10 @@ function renderAdminStats(){
       return `<div class="status-row">
         <span class="status-name">${p.name}</span>
         ${hasVoted
-          ? `<span style="font-size:12px;font-weight:600;color:var(--s)">✅ ${numVoted}/${total} votos</span>`
+          ? `<div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--s)">✅ ${numVoted}/${total}</span>
+              <button onclick="deleteVote('${p.name}')" style="border:none;background:var(--dl);color:var(--d);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer">🗑️</button>
+            </div>`
           : `<span style="font-size:12px;color:var(--text3)">⏳ Sin votar</span>`}
       </div>`;
     }).join('')}
@@ -915,6 +938,39 @@ function renderAdminStats(){
   });
 
   c.innerHTML=html;
+}
+
+async function deleteVote(voter){
+  if(!confirm(`¿Borrar los votos de ${voter}? No se puede deshacer.`))return;
+  ov(true);
+  const ok=await window.FB.deleteVote(voter);
+  ov(false);
+  if(ok){toast(`✅ Votos de ${voter} borrados`);await refreshAdmin();}
+  else toast('❌ Error al borrar');
+}
+
+async function deleteResult(name){
+  if(!confirm(`¿Borrar el test de ${name}? No se puede deshacer.`))return;
+  ov(true);
+  const ok=await window.FB.deleteResult(name);
+  ov(false);
+  if(ok){toast(`✅ Test de ${name} borrado`);await refreshAdmin();}
+  else toast('❌ Error al borrar');
+}
+
+async function resetAll(){
+  if(!confirm('⚠️ ¿Resetear TODO? Se borrarán todos los tests y votos del equipo. Esta acción no se puede deshacer.'))return;
+  if(!confirm('¿Estás completamente segura? Se perderán TODOS los datos.'))return;
+  ov(true);
+  const ok=await window.FB.resetAll();
+  ov(false);
+  if(ok){
+    players.forEach(p=>{p.selfScores=null;p.selfPrimary=null;});
+    teamVotes={};
+    toast('✅ Todos los datos han sido eliminados');
+    updStats();
+    await refreshAdmin();
+  } else toast('❌ Error al resetear');
 }
 
 function getTip(f,t){
