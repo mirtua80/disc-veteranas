@@ -14,7 +14,7 @@ firebase.initializeApp({
   projectId:"disc-veteranas-santfeliu"
 });
 const db=firebase.firestore();
-const auth=firebase.auth();
+auth=firebase.auth();
 auth.signInAnonymously().catch(e=>console.log('auth',e));
 window.FB={
   saveResult:async(n,s,p)=>{try{await db.collection('resultados').doc(n).set({selfScores:s,selfPrimary:p,ts:Date.now()});return true;}catch(e){return false;}},
@@ -33,20 +33,15 @@ window.FB={
     const u2=db.collection('votos').onSnapshot(()=>cb());
     return()=>{u1();u2();};
   },
-  deleteVote:async(voter)=>{
-    try{await db.collection('votos').doc(voter).delete();return true;}catch(e){return false;}
-  },
-  deleteResult:async(name)=>{
-    try{await db.collection('resultados').doc(name).delete();return true;}catch(e){return false;}
-  },
+  deleteVote:async(v)=>{try{await db.collection('votos').doc(v).delete();return true;}catch(e){return false;}},
+  deleteResult:async(n)=>{try{await db.collection('resultados').doc(n).delete();return true;}catch(e){return false;}},
   resetAll:async()=>{
     try{
       const[rs,vs]=await Promise.all([db.collection('resultados').get(),db.collection('votos').get()]);
       const batch=db.batch();
       rs.forEach(d=>batch.delete(d.ref));
       vs.forEach(d=>batch.delete(d.ref));
-      await batch.commit();
-      return true;
+      await batch.commit();return true;
     }catch(e){return false;}
   }
 };
@@ -66,20 +61,34 @@ document.dispatchEvent(new Event('fbReady'));
   -webkit-tap-highlight-color:transparent;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
+body{background:#e8e8ed;display:flex;justify-content:center;}
 #app{width:100%;max-width:430px;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;padding:20px 18px 36px;}
 .screen{display:none;flex-direction:column;flex:1;}
 .screen.active{display:flex;}
+/* BUTTONS */
+.btn-g{width:100%;padding:17px;background:var(--s);color:#fff;border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+.btn-g:active{opacity:.75;}
+.btn-s{width:100%;padding:15px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;color:var(--text);margin-bottom:10px;}
+.btn-s:active{background:var(--border);}
+.btn-tiny{width:100%;padding:12px;background:transparent;border:none;font-size:13px;cursor:pointer;color:var(--text3);margin-bottom:6px;}
+.btn-danger{width:100%;padding:13px;background:#FCEBEB;color:#E24B4A;border:1.5px solid #F09595;border-radius:var(--rsm);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+/* TYPOGRAPHY */
+.stitle{font-size:20px;font-weight:700;margin-bottom:6px;color:var(--text);}
+.ssub{font-size:14px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
 /* WELCOME */
-.club-badge{font-size:52px;text-align:center;margin-bottom:.75rem;}
 .disc-logo{display:flex;gap:8px;justify-content:center;margin-bottom:1rem;}
 .dl{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;}
 .dl.d{background:var(--dl);color:var(--d);border:1.5px solid var(--dm);}
 .dl.i{background:var(--il);color:var(--i);border:1.5px solid var(--im);}
 .dl.s{background:var(--sl);color:var(--s);border:1.5px solid var(--sm);}
 .dl.c{background:var(--cl);color:var(--c);border:1.5px solid var(--cm);}
-.wtitle{font-size:24px;font-weight:700;text-align:center;margin-bottom:4px;color:var(--text);}
-.wclub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:12px;font-weight:500;}
+.sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 14px;border-radius:20px;background:var(--sl);color:var(--s);font-weight:600;}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--s);animation:p 1.5s infinite;}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.icards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.ic{background:var(--bg2);border-radius:var(--rsm);padding:14px;text-align:center;}
+.ic .n{font-size:22px;font-weight:700;color:var(--text);}
+.ic .l{font-size:12px;color:var(--text2);margin-top:3px;}
 .disc-info{background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:16px;}
 .disc-info-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;}
 .disc-info-intro{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;}
@@ -88,32 +97,15 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 .dbadge{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;}
 .drow-title{font-size:13px;font-weight:700;margin-bottom:2px;}
 .drow-desc{font-size:12px;color:var(--text2);line-height:1.5;}
-.sync-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 14px;border-radius:20px;background:var(--sl);color:var(--s);font-weight:600;margin-bottom:12px;}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--s);animation:p 1.5s infinite;}
-@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
-.icards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
-.ic{background:var(--bg2);border-radius:var(--rsm);padding:14px;text-align:center;}
-.ic .n{font-size:22px;font-weight:700;color:var(--text);}
-.ic .l{font-size:12px;color:var(--text2);margin-top:3px;}
-/* BUTTONS */
-.btn-g{width:100%;padding:17px;background:var(--s);color:#fff;border:none;border-radius:var(--radius);font-size:16px;font-weight:600;cursor:pointer;margin-bottom:10px;}
-.btn-g:active{opacity:.75;}
-.btn-s{width:100%;padding:15px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;color:var(--text);margin-bottom:10px;}
-.btn-s:active{background:var(--border);}
-.btn-tiny{width:100%;padding:12px;background:transparent;border:none;font-size:13px;cursor:pointer;color:var(--text3);margin-bottom:6px;}
 /* SETUP */
-.stitle{font-size:20px;font-weight:700;margin-bottom:6px;color:var(--text);}
-.ssub{font-size:14px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
 .plist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:380px;overflow-y:auto;}
 .prow{display:flex;gap:10px;align-items:center;}
 .pnum{width:24px;font-size:13px;color:var(--text3);text-align:center;flex-shrink:0;}
 .pinput{flex:1;padding:14px;border:1.5px solid var(--border);border-radius:var(--rsm);font-size:15px;background:var(--bg);color:var(--text);}
 .pinput:focus{outline:none;border-color:var(--s);}
 .pdel{width:38px;height:38px;border:none;background:var(--dl);color:var(--d);border-radius:10px;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;}
-.btn-addp{padding:14px;background:var(--sl);color:var(--s);border:1.5px solid var(--sm);border-radius:var(--rsm);font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:14px;}
 /* SELECT */
 .vsel{width:100%;padding:15px 14px;border:1.5px solid var(--border);border-radius:var(--rsm);font-size:16px;background:var(--bg);color:var(--text);margin-bottom:16px;-webkit-appearance:none;}
-.vsel:focus{outline:none;border-color:var(--s);}
 /* QUIZ */
 .prog-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:6px;}
 .prog-fill{height:100%;border-radius:4px;transition:width .4s ease;}
@@ -134,9 +126,18 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 .btn-next{flex:1;height:52px;background:var(--s);color:#fff;border:none;border-radius:var(--rsm);font-size:16px;font-weight:600;cursor:pointer;}
 .btn-next:disabled{opacity:.3;cursor:not-allowed;}
 .btn-cancel{width:100%;padding:14px;background:transparent;border:none;font-size:13px;color:var(--text3);cursor:pointer;margin-top:6px;}
+/* REVEAL ANIMATION */
+.reveal-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.reveal-countdown{font-size:80px;font-weight:700;animation:countpop .5s ease;}
+@keyframes countpop{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.reveal-color-big{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700;margin:0 auto 1rem;animation:pop .6s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 /* RESULT */
 .rheader{text-align:center;padding:1rem 0 .5rem;}
 .rcircle{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto .875rem;}
+/* RADAR CHART */
+.radar-wrap{display:flex;justify-content:center;margin:1rem 0;}
+/* SCORE BARS */
 .sbars{display:flex;flex-direction:column;gap:13px;margin:1rem 0;}
 .srow{display:flex;align-items:center;gap:10px;}
 .slbl{width:95px;font-size:13px;font-weight:600;}
@@ -152,6 +153,13 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 .dtab{flex:1;min-width:64px;padding:10px 4px;border:1.5px solid var(--border);background:var(--bg2);border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;text-align:center;color:var(--text2);}
 .dtab.active{border-width:2.5px;}
 .dpanel{display:none;}.dpanel.active{display:block;}
+/* COMPAT */
+.compat-card{background:var(--bg2);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.compat-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.compat-row:last-child{border-bottom:none;}
+.compat-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.compat-name{font-size:13px;font-weight:600;flex:1;}
+.compat-score{font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;}
 /* VOTING */
 .vcard{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
 .vcard-name{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--text);}
@@ -163,9 +171,22 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 .cname{font-size:14px;font-weight:700;display:block;margin-bottom:2px;}
 .cdesc{font-size:12px;color:var(--text2);display:block;line-height:1.4;}
 .vprog{font-size:14px;color:var(--text2);text-align:center;margin-bottom:14px;background:var(--bg2);padding:10px;border-radius:var(--rsm);font-weight:500;}
+/* FIELD VISUAL */
+.field-wrap{background:#2d5a27;border-radius:var(--radius);padding:16px;margin-bottom:12px;position:relative;min-height:280px;}
+.field-lines{position:absolute;inset:12px;border:2px solid rgba(255,255,255,.3);border-radius:8px;}
+.field-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border:2px solid rgba(255,255,255,.3);border-radius:50%;}
+.field-mid{position:absolute;top:50%;left:0;right:0;height:2px;background:rgba(255,255,255,.3);}
+.player-dot{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);}
+.player-dot-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.6);cursor:pointer;}
+.player-dot-name{font-size:9px;color:#fff;margin-top:2px;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.8);font-weight:600;}
+/* PRESENTATION MODE */
+.pres-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1rem;}
+.pres-name{font-size:28px;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+.pres-color{width:140px;height:140px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700;margin:1rem auto;animation:pop .6s cubic-bezier(.34,1.56,.64,1);}
+.pres-title{font-size:18px;font-weight:600;margin-bottom:.5rem;}
+.pres-vs{font-size:14px;font-weight:500;padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:1rem;}
 /* ADMIN */
 .admin-center{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:2rem 0;}
-/* STATS */
 .stat-card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
 .stat-card h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text);}
 .stat-dist{display:flex;gap:8px;margin-bottom:4px;}
@@ -187,56 +208,58 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 .vf-title{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px;}
 .vf-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
 .vf-row:last-child{border-bottom:none;}
-.vf-voter{font-size:13px;color:var(--text2);}
-.vf-color{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;}
 .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
 .chip{border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;}
-.match-note{font-size:12px;margin-top:6px;line-height:1.5;}
 .status-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
 .status-row:last-child{border-bottom:none;}
 .status-name{font-size:14px;color:var(--text);font-weight:500;}
-.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 /* THANKS */
 .thanks-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem 0;}
+/* MOTIVATION */
+.motiv-card{border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:16px;}
+.motiv-emoji{font-size:48px;margin-bottom:.75rem;}
+.motiv-text{font-size:18px;font-weight:600;line-height:1.5;}
 /* OVERLAY TOAST */
 .overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;}
 .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--s);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.ltxt{font-size:14px;color:var(--text2);font-weight:500;}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:#fff;padding:12px 22px;border-radius:24px;font-size:14px;font-weight:500;z-index:1000;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
 .toast.on{opacity:1;}
 .scroll{overflow-y:auto;flex:1;}
+/* DARK MODE */
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1c1c1e;--bg2:#2c2c2e;--border:#3a3a3c;--text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;}
+  body{background:#000;}
+}
 </style>
 </head>
 <body>
 <div id="app">
-<div class="overlay" id="ov"><div class="spinner"></div><div class="ltxt">Conectando...</div></div>
+<div class="overlay" id="ov"><div class="spinner"></div><div style="font-size:14px;color:var(--text2);font-weight:500">Conectando...</div></div>
 <div class="toast" id="tst"></div>
 
 <!-- WELCOME -->
 <div id="screen-welcome" class="screen active">
   <div style="text-align:center;padding:.75rem 0 0">
-    <div class="club-badge">⚽</div>
-    <div class="disc-logo">
-      <div class="dl d">D</div><div class="dl i">I</div><div class="dl s">S</div><div class="dl c">C</div>
-    </div>
-    <div class="wtitle">¿Sabes cómo eres en el campo?</div>
-    <div class="wclub">⚽ Veteranas Sant Feliu de Llobregat</div>
+    <div style="font-size:52px;margin-bottom:.75rem">⚽</div>
+    <div class="disc-logo"><div class="dl d">D</div><div class="dl i">I</div><div class="dl s">S</div><div class="dl c">C</div></div>
+    <div style="font-size:24px;font-weight:700;margin-bottom:4px;color:var(--text)">¿Sabes cómo eres en el campo?</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;font-weight:500">⚽ Veteranas Sant Feliu de Llobregat</div>
   </div>
-  <div class="disc-info" style="margin-top:12px">
+  <div class="disc-info">
     <div class="disc-info-title">¿Qué es el método DISC?</div>
-    <div class="disc-info-intro">El DISC es un modelo de comportamiento que identifica cuatro estilos de personalidad. No hay colores mejores ni peores — cada una aporta algo único al equipo.</div>
-    <div class="drow"><div class="dbadge" style="background:var(--dl);color:var(--d)">D</div><div><div class="drow-title" style="color:var(--d)">Dominante — Roja</div><div class="drow-desc">Orientada a resultados, directa y decidida. Le gustan los retos y actúa rápido.</div></div></div>
-    <div class="drow"><div class="dbadge" style="background:var(--il);color:var(--i)">I</div><div><div class="drow-title" style="color:var(--i)">Influyente — Amarilla</div><div class="drow-desc">Entusiasta, sociable y optimista. Motiva al equipo y aporta creatividad.</div></div></div>
-    <div class="drow"><div class="dbadge" style="background:var(--sl);color:var(--s)">S</div><div><div class="drow-title" style="color:var(--s)">Estable — Verde</div><div class="drow-desc">Empática, leal y constante. El pegamento del equipo: escucha y nunca falla.</div></div></div>
-    <div class="drow"><div class="dbadge" style="background:var(--cl);color:var(--c)">C</div><div><div class="drow-title" style="color:var(--c)">Concienzuda — Azul</div><div class="drow-desc">Analítica, precisa y rigurosa. Piensa antes de actuar y cuida los detalles.</div></div></div>
+    <div class="disc-info-intro">Modelo de comportamiento con cuatro estilos de personalidad. No hay colores mejores ni peores — cada una aporta algo único.</div>
+    <div class="drow"><div class="dbadge" style="background:var(--dl);color:var(--d)">D</div><div><div class="drow-title" style="color:var(--d)">Dominante — Roja</div><div class="drow-desc">Orientada a resultados, directa y decidida. Actúa rápido sin rodeos.</div></div></div>
+    <div class="drow"><div class="dbadge" style="background:var(--il);color:var(--i)">I</div><div><div class="drow-title" style="color:var(--i)">Influyente — Amarilla</div><div class="drow-desc">Entusiasta y optimista. Motiva al equipo y aporta creatividad.</div></div></div>
+    <div class="drow"><div class="dbadge" style="background:var(--sl);color:var(--s)">S</div><div><div class="drow-title" style="color:var(--s)">Estable — Verde</div><div class="drow-desc">Empática, leal y constante. El pegamento del equipo.</div></div></div>
+    <div class="drow"><div class="dbadge" style="background:var(--cl);color:var(--c)">C</div><div><div class="drow-title" style="color:var(--c)">Concienzuda — Azul</div><div class="drow-desc">Analítica y rigurosa. Piensa antes de actuar y cuida los detalles.</div></div></div>
   </div>
-  <div style="text-align:center"><div class="sync-pill"><span class="pulse"></span>Datos en tiempo real</div></div>
+  <div style="text-align:center;margin-bottom:12px"><div class="sync-pill"><span class="pulse"></span>Datos en tiempo real</div></div>
   <div class="icards">
     <div class="ic"><div class="n">40</div><div class="l">preguntas</div></div>
     <div class="ic"><div class="n">~7</div><div class="l">minutos</div></div>
     <div class="ic"><div class="n" id="stat-total">—</div><div class="l">jugadoras</div></div>
-    <div class="ic"><div class="n" id="stat-done">—</div><div class="l">test completados</div></div>
+    <div class="ic"><div class="n" id="stat-done">—</div><div class="l">completados</div></div>
   </div>
   <button class="btn-g" onclick="goSelectPlayer()">🧍 Hacer mi test DISC</button>
   <button class="btn-s" onclick="goVotingSetup()">🗳️ Votar a las compañeras</button>
@@ -255,14 +278,8 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
 <!-- QUIZ -->
 <div id="screen-quiz" class="screen">
   <div class="prog-bar"><div class="prog-fill" id="pfill"></div></div>
-  <div class="qmeta">
-    <span class="qcount" id="qcount">1 / 40</span>
-    <span class="qbadge" id="qbadge"></span>
-  </div>
-  <div class="qcard">
-    <div class="qemoji" id="qemoji"></div>
-    <div class="qtext" id="qtext"></div>
-  </div>
+  <div class="qmeta"><span class="qcount" id="qcount">1 / 40</span><span class="qbadge" id="qbadge"></span></div>
+  <div class="qcard"><div class="qemoji" id="qemoji"></div><div class="qtext" id="qtext"></div></div>
   <div class="olbl">¿Con cuál te identificas más?</div>
   <div class="opts" id="opts"></div>
   <div class="navrow">
@@ -272,19 +289,36 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
   <button class="btn-cancel" onclick="cancelTest()">✕ Cancelar y borrar respuestas</button>
 </div>
 
+<!-- REVEAL -->
+<div id="screen-reveal" class="screen">
+  <div class="reveal-wrap">
+    <div id="reveal-content"></div>
+  </div>
+  <button class="btn-g" id="reveal-continue" onclick="showFullResult()" style="display:none">Ver mi perfil completo →</button>
+</div>
+
 <!-- RESULT -->
 <div id="screen-result" class="screen">
   <div class="scroll">
     <div id="rheader" class="rheader"></div>
+    <div id="radar-container" class="radar-wrap"></div>
     <div class="sbars" id="sbars"></div>
     <div class="dtabs" id="dtabs"></div>
     <div id="dpanels"></div>
     <button class="btn-g" style="margin-top:.75rem" onclick="goVotingSetup()">🗳️ Votar a las compañeras</button>
-    <div class="pcard" style="text-align:center;margin-top:.5rem">
+    <div class="pcard" style="text-align:center">
       <p style="font-size:13px">📅 Los resultados del equipo se revelarán en la cena. ¡Hasta entonces es secreto!</p>
     </div>
     <button class="btn-s" onclick="showScr('welcome')">← Inicio</button>
   </div>
+</div>
+
+<!-- MOTIVATION -->
+<div id="screen-motivation" class="screen">
+  <div class="stitle">💪 Frase del partido</div>
+  <div class="ssub">Tu motivación antes de salir al campo</div>
+  <div id="motiv-content"></div>
+  <button class="btn-g" onclick="showScr('welcome')">⚽ ¡A por ellas!</button>
 </div>
 
 <!-- VOTING SETUP -->
@@ -320,16 +354,74 @@ body{background:#e8e8ed;display:flex;justify-content:center;padding:0;}
   </div>
 </div>
 
+<!-- ADMIN MENU -->
+<div id="screen-admin-menu" class="screen">
+  <div style="font-size:52px;text-align:center;margin-bottom:.75rem">🏆</div>
+  <div class="stitle" style="text-align:center">Panel administradora</div>
+  <div class="ssub" style="text-align:center">Veteranas Sant Feliu de Llobregat</div>
+  <button class="btn-g" onclick="goAdminStats()">📊 Ver estadísticas del equipo</button>
+  <button class="btn-s" onclick="goFieldView()">🏟️ Ver equipo en el campo</button>
+  <button class="btn-s" onclick="goPresentation()">🎭 Modo presentación (cena)</button>
+  <button class="btn-s" onclick="goCompat()">💞 Compatibilidad entre jugadoras</button>
+  <button class="btn-danger" onclick="showScr('admin-reset')">🗑️ Gestión de datos</button>
+  <button class="btn-tiny" onclick="isAdmin=false;showScr('welcome')">🔒 Cerrar sesión</button>
+</div>
+
 <!-- ADMIN STATS -->
 <div id="screen-admin-stats" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-    <div class="stitle" style="margin-bottom:0">📊 Panel administradora</div>
-    <button onclick="refreshAdmin()" style="border:none;background:none;cursor:pointer;font-size:22px">🔄</button>
+    <div class="stitle" style="margin-bottom:0">📊 Estadísticas</div>
+    <button onclick="goAdminStats()" style="border:none;background:none;cursor:pointer;font-size:22px">🔄</button>
   </div>
-  <div class="ssub">Veteranas Sant Feliu de Llobregat</div>
-  <button onclick="resetAll()" style="width:100%;padding:12px;background:#FCEBEB;color:#E24B4A;border:1.5px solid #F09595;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px">🗑️ Resetear todos los datos</button>
+  <div class="ssub">Resultados del equipo</div>
   <div class="scroll" id="admin-content"></div>
-  <button class="btn-s" style="margin-top:.75rem" onclick="isAdmin=false;showScr('welcome')">🔒 Cerrar sesión</button>
+  <button class="btn-s" style="margin-top:.75rem" onclick="showScr('admin-menu')">← Volver al panel</button>
+</div>
+
+<!-- FIELD VIEW -->
+<div id="screen-field" class="screen">
+  <div class="stitle">🏟️ El equipo en el campo</div>
+  <div class="ssub">Posición ideal según perfil DISC</div>
+  <div class="field-wrap" id="field-content">
+    <div class="field-lines"></div>
+    <div class="field-center"></div>
+    <div class="field-mid"></div>
+  </div>
+  <div id="field-legend" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+  <button class="btn-s" onclick="showScr('admin-menu')">← Volver al panel</button>
+</div>
+
+<!-- PRESENTATION MODE -->
+<div id="screen-presentation" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div class="stitle" style="margin-bottom:0">🎭 Modo cena</div>
+    <div id="pres-counter" style="font-size:13px;color:var(--text2)"></div>
+  </div>
+  <div id="pres-content" class="pres-wrap"></div>
+  <div style="display:flex;gap:10px;margin-top:auto">
+    <button class="btn-s" style="flex:1;margin-bottom:0" id="btn-pres-prev" onclick="presNav(-1)">← Anterior</button>
+    <button class="btn-g" style="flex:1;margin-bottom:0" id="btn-pres-next" onclick="presNav(1)">Siguiente →</button>
+  </div>
+  <button class="btn-tiny" onclick="showScr('admin-menu')">✕ Salir del modo cena</button>
+</div>
+
+<!-- COMPAT -->
+<div id="screen-compat" class="screen">
+  <div class="stitle">💞 Compatibilidad</div>
+  <div class="ssub">Selecciona dos jugadoras para ver cómo se complementan</div>
+  <select class="vsel" id="compat-a"><option value="">— Jugadora 1 —</option></select>
+  <select class="vsel" id="compat-b"><option value="">— Jugadora 2 —</option></select>
+  <button class="btn-g" onclick="showCompat()">Ver compatibilidad →</button>
+  <div id="compat-result"></div>
+  <button class="btn-s" onclick="showScr('admin-menu')">← Volver al panel</button>
+</div>
+
+<!-- ADMIN RESET -->
+<div id="screen-admin-reset" class="screen">
+  <div class="stitle">🗑️ Gestión de datos</div>
+  <div class="ssub">Borra datos individuales o resetea todo el equipo</div>
+  <div class="scroll" id="reset-content"></div>
+  <button class="btn-s" style="margin-top:.75rem" onclick="showScr('admin-menu')">← Volver al panel</button>
 </div>
 
 <!-- THANKS -->
@@ -356,29 +448,49 @@ const DESCS={D:'Decidida · Directa · Líder',I:'Energía · Creatividad · Car
 const TEAM=['Laura','Ana','Cris','Natalia','Diana','Esther','Erica','Mireia','Mary','Sandra','Marta M.','Vero','Marta A.','Judith'];
 const ADMIN_PWD='SantFeliu2025';
 
+const MOTIVATIONS={
+  D:['⚡ "Hoy el campo es tuyo. Sal a mandarlo."','🔥 "Las que ganan no esperan el momento perfecto. Lo crean."','💪 "Deja que hablen. Tú deja que los resultados respondan."','🏆 "No has llegado hasta aquí para quedarte a medias."'],
+  I:['✨ "Tu energía hoy va a cambiar el partido. Úsala."','🎉 "El mejor momento es ahora mismo. Disfrútalo."','⚡ "Contagia tu entusiasmo. El equipo lo necesita."','🌟 "Juega con alegría. Eso es lo que te hace imparable."'],
+  S:['❤️ "Tu equipo te necesita. Como siempre, ahí estarás."','🌿 "La constancia gana partidos. Tú lo sabes mejor que nadie."','🤝 "Hoy, como siempre, serás el pilar de las demás."','💚 "Tu calma en momentos difíciles vale un gol."'],
+  C:['🧠 "Has preparado esto. Ahora confía en tu trabajo."','📐 "Los detalles ganan partidos. Y tú los dominas."','🎯 "Ejecuta el plan. Estás más preparada que ninguna."','🔵 "La precisión es tu arma. Úsala."']
+};
+
+const COMPAT_MAP={
+  'D-D':{score:72,label:'Alta competencia',desc:'Dos líderes que se exigen mutuamente. Gran potencia pero hay que cuidar que no choquen por el control.',color:'#E24B4A'},
+  'D-I':{score:88,label:'Dupla explosiva',desc:'La determinación de la D más la energía de la I. Se complementan muy bien: una cierra y la otra abre puertas.',color:'#FF6B35'},
+  'D-S':{score:65,label:'Complementarias',desc:'La D necesita aprender a escuchar más y la S a ser más directa. Juntas son equilibrio.',color:'#8B5E3C'},
+  'D-C':{score:70,label:'Resultados vs. rigor',desc:'La D quiere resultados ya, la C quiere hacerlo bien. Tensión productiva si se respetan.',color:'#9B59B6'},
+  'I-I':{score:80,label:'Mucha energía',desc:'Dos influyentes juntas generan mucho buen rollo. Cuidado con perder el foco.',color:'#EF9F27'},
+  'I-S':{score:92,label:'La mejor dupla',desc:'La I motiva y la S sostiene. Una combinación casi perfecta de energía y estabilidad.',color:'#1D9E75'},
+  'I-C':{score:68,label:'Creatividad vs. análisis',desc:'La I improvisa, la C planifica. Necesitan respetarse para sacar lo mejor de cada una.',color:'#378ADD'},
+  'S-S':{score:85,label:'Armonía total',desc:'Dos personas leales y empáticas. Excelente cohesión de equipo aunque pueden evitar conflictos necesarios.',color:'#1D9E75'},
+  'S-C':{score:78,label:'Solidez y calidad',desc:'Una cuida a las personas, la otra cuida los procesos. Juntas generan confianza y rigor.',color:'#2980B9'},
+  'C-C':{score:75,label:'Perfeccionismo doble',desc:'Muy rigurosas y analíticas. Gran calidad pero pueden bloquearse en los detalles.',color:'#378ADD'}
+};
+
 const PROFILES={
-  D:{title:'Perfil Dominante — Roja',tagline:'La capitana natural del campo',position:'Delantera o box-to-box',
-    description:'Eres la que manda en el campo. Tomas decisiones rápidas, exiges el máximo y no te conformas con el empate. Tu voz se escucha en el vestuario y eso mueve al equipo hacia adelante.',
+  D:{title:'Perfil Dominante — Roja',tagline:'La capitana natural del campo',position:'Delantera o box-to-box',fieldPos:{x:50,y:20},
+    description:'Eres la que manda en el campo. Tomas decisiones rápidas, exiges el máximo y no te conformas con el empate.',
     strengths:['Liderazgo bajo presión','Mentalidad ganadora','Decisión rápida','Empuje en momentos clave'],
     growth:['Escuchar más a las compañeras','Celebrar el proceso','No desesperar si el plan falla','Cuidar el tono bajo tensión'],
     motivation:'Los partidos difíciles y demostrar que el equipo puede.',
     fear:'Perder el control o que el equipo se rinda.',
     communication:'Directa y al grano. Objetivo claro y ella actúa. Sin rodeos.'},
-  I:{title:'Perfil Influyente — Amarilla',tagline:'La energía del vestuario',position:'Extremo o mediapunta creativa',
+  I:{title:'Perfil Influyente — Amarilla',tagline:'La energía del vestuario',position:'Extremo o mediapunta',fieldPos:{x:25,y:35},
     description:'Eres la que levanta el ánimo cuando van perdiendo. Tu energía es contagiosa y el vestuario estaría muy apagado sin ti.',
     strengths:['Motivación del grupo','Creatividad táctica','Comunicación y carisma','Ambiente positivo'],
     growth:['Constancia defensiva','Seguir los acuerdos tácticos','Bajar el ritmo cuando toca','Escuchar a la míster'],
     motivation:'El juego bonito y la celebración colectiva.',
     fear:'Que el ambiente sea tenso o nadie la escuche.',
     communication:'Con entusiasmo y contexto emocional. Cuéntale el porqué.'},
-  S:{title:'Perfil Estable — Verde',tagline:'El corazón del equipo',position:'Lateral, portera o pivote',
-    description:'Eres la columna vertebral del equipo. Estás en cada entreno, apoyas a quien está lesionada y recuerdas el cumpleaños de todas.',
+  S:{title:'Perfil Estable — Verde',tagline:'El corazón del equipo',position:'Lateral o portera',fieldPos:{x:75,y:75},
+    description:'Eres la columna vertebral. Estás en cada entreno, apoyas a quien está lesionada y recuerdas el cumpleaños de todas.',
     strengths:['Fiabilidad absoluta','Empatía y escucha','Cohesión del grupo','Constancia en el tiempo'],
     growth:['Exigir más para ti misma','Decir lo que piensas','Adaptarte al cambio','No cargar con todo'],
     motivation:'El bienestar del grupo y que el equipo esté unido.',
     fear:'Los conflictos internos y los cambios de última hora.',
     communication:'Con calma y cariño. Necesita sentirse escuchada antes de actuar.'},
-  C:{title:'Perfil Concienzuda — Azul',tagline:'La analista del equipo',position:'Líbero o mediocentro',
+  C:{title:'Perfil Concienzuda — Azul',tagline:'La analista del equipo',position:'Líbero o mediocentro',fieldPos:{x:50,y:60},
     description:'Has visto el vídeo del rival y recuerdas el sistema de la temporada pasada. Tu rigor eleva el nivel del equipo.',
     strengths:['Análisis táctico','Atención al detalle','Fiabilidad y rigor','Preparación exhaustiva'],
     growth:['Decidir sin certeza total','Soltar el control','Disfrutar más el partido','Compartir tus análisis'],
@@ -598,8 +710,9 @@ const questions=[
 let players=TEAM.map(n=>({name:n,selfScores:null,selfPrimary:null}));
 let teamVotes={};
 let cur=0,ans=new Array(40).fill(null),currentPlayer=null,currentVoter=null;
-let isAdmin=false;
-let _unsub=null;
+let isAdmin=false,_unsub=null;
+let resultData=null; // store last result for reveal
+let presIdx=0; // presentation index
 
 // ===== HELPERS =====
 function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');}
@@ -610,17 +723,15 @@ function esc(s){return s.replace(/[^a-zA-Z0-9]/g,'_');}
 // ===== INIT =====
 async function init(){
   ov(true);
-  if(!window._fbReady) await new Promise(r=>document.addEventListener('fbReady',r,{once:true}));
+  if(!window._fbReady)await new Promise(r=>document.addEventListener('fbReady',r,{once:true}));
   await refreshFromCloud();
   if(_unsub)_unsub();
   _unsub=window.FB.subscribe(async()=>{await refreshFromCloud();updStats();});
-  updStats();
-  ov(false);
-  showScr('welcome');
+  updStats();ov(false);showScr('welcome');
 }
 
 async function refreshFromCloud(){
-  const {results,votes}=await window.FB.loadAll();
+  const{results,votes}=await window.FB.loadAll();
   teamVotes=votes||{};
   players.forEach(p=>{if(results[p.name]){p.selfScores=results[p.name].selfScores;p.selfPrimary=results[p.name].selfPrimary;}});
 }
@@ -651,8 +762,7 @@ const SDATA={D:{name:'Dominante',color:'#E24B4A',bg:'#FCEBEB'},I:{name:'Influyen
 
 function renderQ(){
   const q=questions[cur];const sec=SDATA[q.s];
-  const pct=((cur+1)/40)*100;
-  document.getElementById('pfill').style.cssText=`width:${pct}%;background:${sec.color}`;
+  document.getElementById('pfill').style.cssText=`width:${((cur+1)/40)*100}%;background:${sec.color}`;
   document.getElementById('qcount').textContent=(cur+1)+' / 40';
   const b=document.getElementById('qbadge');b.textContent=sec.name;b.style.background=sec.bg;b.style.color=sec.color;
   document.getElementById('qemoji').textContent=q.e;
@@ -666,7 +776,7 @@ function renderQ(){
   });
   const bn=document.getElementById('btn-next');
   bn.disabled=ans[cur]===null;
-  bn.textContent=cur===39?'¡Ver mi perfil!':'Siguiente →';
+  bn.textContent=cur===39?'¡Terminar!':'Siguiente →';
   document.getElementById('btn-back').style.visibility=cur===0?'hidden':'visible';
 }
 
@@ -680,38 +790,72 @@ function selOpt(i){
   if(navigator.vibrate)navigator.vibrate(10);
 }
 
-function nextQ(){if(ans[cur]===null)return;if(cur===39){showResult();return;}cur++;renderQ();}
+function nextQ(){if(ans[cur]===null)return;if(cur===39){startReveal();return;}cur++;renderQ();}
 function prevQ(){if(cur===0)return;cur--;renderQ();}
 function cancelTest(){if(confirm('¿Segura? Se borrarán todas tus respuestas.')){cur=0;ans=new Array(40).fill(null);currentPlayer=null;showScr('welcome');}}
 
-// ===== RESULT =====
+// ===== REVEAL ANIMATION =====
 function calcSc(){
   const sc={D:0,I:0,S:0,C:0};
   questions.forEach((q,qi)=>{if(ans[qi]!==null){const w=q.opts[ans[qi]].w;DISC.forEach(d=>sc[d]+=w[d]);}});
   return sc;
 }
 
-async function showResult(){
+async function startReveal(){
   const sc=calcSc();
   const total=DISC.reduce((s,d)=>s+sc[d],0);
   const pcts={};DISC.forEach(d=>pcts[d]=total>0?Math.round(sc[d]/total*100):0);
   const primary=DISC.reduce((a,b)=>sc[a]>=sc[b]?a:b);
+  resultData={sc,pcts,primary};
+
+  // Save to Firebase
   if(currentPlayer){
     ov(true);
     await window.FB.saveResult(currentPlayer,sc,primary);
     ov(false);
-    toast('✅ Resultado guardado');
     const p=players.find(pp=>pp.name===currentPlayer);
     if(p){p.selfScores=sc;p.selfPrimary=primary;}
     updStats();
   }
+
+  showScr('reveal');
+  const el=document.getElementById('reveal-content');
+  const btn=document.getElementById('reveal-continue');
+  btn.style.display='none';
+
+  // Countdown 3-2-1
+  for(let i=3;i>=1;i--){
+    el.innerHTML=`<div class="reveal-countdown" style="color:var(--text)">${i}</div><div style="font-size:16px;color:var(--text2);margin-top:.5rem">Tu color es...</div>`;
+    await sleep(900);
+  }
+
+  // Big reveal
+  el.innerHTML=`
+    <div style="font-size:18px;color:var(--text2);margin-bottom:1rem;font-weight:500">¡Tu color DISC es!</div>
+    <div class="reveal-color-big" style="background:${LIGHTS[primary]};color:${COLORS[primary]};border:3px solid ${MIDS[primary]}">${primary}</div>
+    <div style="font-size:26px;font-weight:700;color:${COLORS[primary]};margin-bottom:.5rem">${PROFILES[primary].title}</div>
+    <div style="font-size:16px;color:var(--text2);margin-bottom:1.5rem">${PROFILES[primary].tagline}</div>
+    <div style="font-size:14px;font-weight:600;background:${LIGHTS[primary]};color:${COLORS[primary]};padding:8px 16px;border-radius:20px;display:inline-block">Posición ideal: ${PROFILES[primary].position}</div>
+  `;
+  if(navigator.vibrate)navigator.vibrate([100,50,100]);
+  btn.style.display='block';
+}
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function showFullResult(){
+  const{sc,pcts,primary}=resultData;
   const prof=PROFILES[primary];
+
   document.getElementById('rheader').innerHTML=`
     <div class="rcircle" style="background:${LIGHTS[primary]};color:${COLORS[primary]};border:2px solid ${MIDS[primary]}">${primary}</div>
     <div style="font-size:20px;font-weight:700;margin-bottom:4px;color:${COLORS[primary]}">${prof.title}</div>
     <div style="font-size:15px;color:var(--text2)">${prof.tagline}</div>
-    <div style="margin-top:8px;font-size:12px;font-weight:600;background:${LIGHTS[primary]};color:${COLORS[primary]};padding:4px 14px;border-radius:20px;display:inline-block">Posición ideal: ${prof.position}</div>
   `;
+
+  // Radar chart SVG
+  document.getElementById('radar-container').innerHTML=buildRadar(pcts,primary);
+
   document.getElementById('sbars').innerHTML=DISC.map(d=>`
     <div class="srow">
       <div class="slbl" style="color:${COLORS[d]}">${ICONS[d]} ${NAMES[d]}</div>
@@ -720,11 +864,14 @@ async function showResult(){
     </div>
   `).join('');
   setTimeout(()=>DISC.forEach(d=>{const el=document.getElementById('sf-'+d);if(el)el.style.width=pcts[d]+'%';}),100);
-  const tabs=[{id:'ov',l:'Perfil'},{id:'st',l:'Fortalezas'},{id:'gr',l:'Mejora'},{id:'co',l:'Compañeras'}];
+
+  const tabs=[{id:'ov',l:'Perfil'},{id:'st',l:'Fortalezas'},{id:'gr',l:'Mejora'},{id:'co',l:'Compañeras'},{id:'mo',l:'Motivación'}];
   document.getElementById('dtabs').innerHTML=tabs.map((t,i)=>`
     <button class="dtab ${i===0?'active':''}" style="${i===0?`border-color:${COLORS[primary]};color:${COLORS[primary]};`:''}"
       onclick="swTab('${t.id}','${primary}',this)">${t.l}</button>
   `).join('');
+
+  const motiv=MOTIVATIONS[primary][Math.floor(Math.random()*MOTIVATIONS[primary].length)];
   document.getElementById('dpanels').innerHTML=`
     <div id="p-ov" class="dpanel active">
       <div class="pcard"><h3>Tu perfil en el equipo</h3><p>${prof.description}</p></div>
@@ -744,8 +891,46 @@ async function showResult(){
       </div>
       <div class="pcard"><h3>Cómo comunicarse contigo</h3><p>${prof.communication}</p></div>
     </div>
+    <div id="p-mo" class="dpanel">
+      <div class="motiv-card" style="background:${LIGHTS[primary]}">
+        <div class="motiv-emoji">${ICONS[primary]}</div>
+        <div class="motiv-text" style="color:${COLORS[primary]}">${motiv}</div>
+      </div>
+      <button class="btn-s" onclick="showMotivation('${primary}')">🎲 Otra frase</button>
+    </div>
   `;
   showScr('result');
+}
+
+function showMotivation(primary){
+  const motiv=MOTIVATIONS[primary][Math.floor(Math.random()*MOTIVATIONS[primary].length)];
+  document.querySelector('#p-mo .motiv-text').textContent=motiv;
+}
+
+// ===== RADAR CHART =====
+function buildRadar(pcts,primary){
+  const size=200,cx=100,cy=100,r=70;
+  const labels=['D','I','S','C'];
+  const angles=[-90,-0,90,180].map(a=>a*Math.PI/180);
+  const maxVal=100;
+  const pts=labels.map((l,i)=>{
+    const v=(pcts[l]||0)/maxVal;
+    return{x:cx+r*v*Math.cos(angles[i]),y:cy+r*v*Math.sin(angles[i])};
+  });
+  const polygon=pts.map(p=>`${p.x},${p.y}`).join(' ');
+  const axes=labels.map((l,i)=>`<line x1="${cx}" y1="${cy}" x2="${cx+r*Math.cos(angles[i])}" y2="${cy+r*Math.sin(angles[i])}" stroke="var(--border)" stroke-width="1.5"/>`).join('');
+  const circles=[0.25,0.5,0.75,1].map(v=>`<circle cx="${cx}" cy="${cy}" r="${r*v}" fill="none" stroke="var(--border)" stroke-width="1"/>`).join('');
+  const lbls=labels.map((l,i)=>{
+    const lx=cx+(r+16)*Math.cos(angles[i]);
+    const ly=cy+(r+16)*Math.sin(angles[i]);
+    return `<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="700" fill="${COLORS[l]}">${l}</text>`;
+  }).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    ${circles}${axes}
+    <polygon points="${polygon}" fill="${COLORS[primary]}33" stroke="${COLORS[primary]}" stroke-width="2.5" stroke-linejoin="round"/>
+    ${pts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${COLORS[primary]}"/>`).join('')}
+    ${lbls}
+  </svg>`;
 }
 
 function swTab(id,primary,el){
@@ -822,163 +1007,8 @@ function goAdmin(){document.getElementById('admin-pwd').value='';showScr('admin-
 
 function checkAdmin(){
   if(document.getElementById('admin-pwd').value===ADMIN_PWD){
-    isAdmin=true;toast('Bienvenida coordinadora');
-    refreshAdmin();
+    isAdmin=true;toast('Bienvenida coordinadora');showScr('admin-menu');
   } else {
     document.getElementById('admin-pwd').value='';
     document.getElementById('admin-pwd').placeholder='Contraseña incorrecta';
-    setTimeout(()=>document.getElementById('admin-pwd').placeholder='Contraseña',1500);
-  }
-}
-
-async function refreshAdmin(){
-  ov(true);await refreshFromCloud();ov(false);
-  renderAdminStats();
-  showScr('admin-stats');
-}
-
-function renderAdminStats(){
-  const c=document.getElementById('admin-content');
-  let html='';
-
-  // 1. DISTRIBUCIÓN GENERAL
-  const withTest=players.filter(p=>p.selfPrimary);
-  const dist={D:0,I:0,S:0,C:0};
-  withTest.forEach(p=>dist[p.selfPrimary]++);
-  html+=`<div class="stat-card">
-    <h3>🎨 Distribución del equipo (${withTest.length}/${players.length} tests completados)</h3>
-    <div class="stat-dist">${DISC.filter(d=>dist[d]>0).map(d=>`
-      <div class="stat-cell" style="background:${LIGHTS[d]}">
-        <div class="stat-letter" style="color:${COLORS[d]}">${d}</div>
-        <div class="stat-count" style="color:${COLORS[d]}">${dist[d]} jug.</div>
-        <div style="font-size:10px;color:${COLORS[d]};margin-top:2px">${NAMES[d]}</div>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  // 2. QUIÉN HA HECHO EL TEST
-  html+=`<div class="stat-card">
-    <h3>🧍 Estado del test</h3>
-    ${players.map(p=>`
-      <div class="status-row">
-        <span class="status-name">${p.name}</span>
-        ${p.selfPrimary
-          ? `<div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:${LIGHTS[p.selfPrimary]};color:${COLORS[p.selfPrimary]}">${ICONS[p.selfPrimary]} ${p.selfPrimary}</span>
-              <button onclick="deleteResult('${p.name}')" style="border:none;background:var(--dl);color:var(--d);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer">🗑️</button>
-            </div>`
-          : `<span style="font-size:12px;color:var(--text3)">⏳ Pendiente</span>`}
-      </div>`).join('')}
-  </div>`;
-
-  // 3. QUIÉN HA VOTADO
-  html+=`<div class="stat-card">
-    <h3>🗳️ Estado de las votaciones</h3>
-    ${players.map(p=>{
-      const hasVoted=teamVotes[p.name]&&Object.keys(teamVotes[p.name]).length>0;
-      const numVoted=hasVoted?Object.keys(teamVotes[p.name]).length:0;
-      const total=players.length-1;
-      return `<div class="status-row">
-        <span class="status-name">${p.name}</span>
-        ${hasVoted
-          ? `<div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:12px;font-weight:600;color:var(--s)">✅ ${numVoted}/${total}</span>
-              <button onclick="deleteVote('${p.name}')" style="border:none;background:var(--dl);color:var(--d);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer">🗑️</button>
-            </div>`
-          : `<span style="font-size:12px;color:var(--text3)">⏳ Sin votar</span>`}
-      </div>`;
-    }).join('')}
-  </div>`;
-
-  // 4. DETALLE POR JUGADORA
-  html+=`<div class="stat-card"><h3>📋 Detalle por jugadora</h3></div>`;
-
-  players.forEach(p=>{
-    const recv={D:0,I:0,S:0,C:0};let tv=0;
-    Object.entries(teamVotes).forEach(([voter,vs])=>{
-      if(voter!==p.name&&vs&&vs[p.name]){recv[vs[p.name]]++;tv++;}
-    });
-    const vPri=tv>0?DISC.reduce((a,b)=>recv[a]>=recv[b]?a:b):null;
-    const hasSelf=!!p.selfPrimary;
-    let sp=null;
-    if(hasSelf&&p.selfScores){
-      const tot=DISC.reduce((s,d)=>s+p.selfScores[d],0)||1;
-      sp={};DISC.forEach(d=>sp[d]=Math.round(p.selfScores[d]/tot*100));
-    }
-
-    html+=`<div class="player-stat">
-      <div class="ps-header">
-        <div class="ps-avatar" style="background:${hasSelf?LIGHTS[p.selfPrimary]:'var(--bg2)'};color:${hasSelf?COLORS[p.selfPrimary]:'var(--text3)'}">${hasSelf?p.selfPrimary:'?'}</div>
-        <div>
-          <div class="ps-name">${p.name}</div>
-          ${hasSelf?`<span class="ps-badge" style="background:${LIGHTS[p.selfPrimary]};color:${COLORS[p.selfPrimary]}">Autoperfil: ${NAMES[p.selfPrimary]}</span>`:`<span class="ps-badge" style="background:var(--bg2);color:var(--text3)">Sin test</span>`}
-        </div>
-      </div>
-      ${sp?`<div class="mbars">${DISC.map(d=>`
-        <div class="mrow">
-          <div class="mlbl" style="color:${COLORS[d]}">${ICONS[d]} ${NAMES[d]}</div>
-          <div class="mtrk"><div class="mfill" style="width:${sp[d]}%;background:${COLORS[d]}"></div></div>
-          <div class="mpct">${sp[d]}%</div>
-        </div>`).join('')}</div>`:''}
-      ${tv>0?`
-        <div class="votes-from">
-          <div class="vf-title">🗳️ Cómo la ven las compañeras (${tv} votos)</div>
-          <div class="chips">${DISC.map(d=>recv[d]>0?`<span class="chip" style="background:${LIGHTS[d]};color:${COLORS[d]}">${ICONS[d]} ${recv[d]}×</span>`:'').join('')}</div>
-          ${vPri?`<div style="font-size:13px;font-weight:700;color:${COLORS[vPri]};margin-top:6px">El equipo la ve: ${NAMES[vPri]}</div>`:''}
-          ${hasSelf&&vPri&&p.selfPrimary!==vPri?`<div class="match-note" style="color:var(--text2)">💡 Ella se ve <strong style="color:${COLORS[p.selfPrimary]}">${NAMES[p.selfPrimary]}</strong> pero el equipo la ve <strong style="color:${COLORS[vPri]}">${NAMES[vPri]}</strong></div>`:''}
-          ${hasSelf&&vPri&&p.selfPrimary===vPri?`<div class="match-note" style="color:${COLORS[vPri]}">✅ Autoperfil y equipo coinciden</div>`:''}
-          <div class="vf-title" style="margin-top:10px">Votos individuales:</div>
-          ${Object.entries(teamVotes).filter(([voter])=>voter!==p.name&&teamVotes[voter]&&teamVotes[voter][p.name]).map(([voter,vs])=>`
-            <div class="vf-row">
-              <span class="vf-voter">${voter}</span>
-              <span class="vf-color" style="background:${LIGHTS[vs[p.name]]};color:${COLORS[vs[p.name]]}">${ICONS[vs[p.name]]} ${NAMES[vs[p.name]]}</span>
-            </div>`).join('')}
-        </div>`:`<div style="margin-top:10px;font-size:13px;color:var(--text3)">Sin votos aún</div>`}
-    </div>`;
-  });
-
-  c.innerHTML=html;
-}
-
-async function deleteVote(voter){
-  if(!confirm(`¿Borrar los votos de ${voter}? No se puede deshacer.`))return;
-  ov(true);
-  const ok=await window.FB.deleteVote(voter);
-  ov(false);
-  if(ok){toast(`✅ Votos de ${voter} borrados`);await refreshAdmin();}
-  else toast('❌ Error al borrar');
-}
-
-async function deleteResult(name){
-  if(!confirm(`¿Borrar el test de ${name}? No se puede deshacer.`))return;
-  ov(true);
-  const ok=await window.FB.deleteResult(name);
-  ov(false);
-  if(ok){toast(`✅ Test de ${name} borrado`);await refreshAdmin();}
-  else toast('❌ Error al borrar');
-}
-
-async function resetAll(){
-  if(!confirm('⚠️ ¿Resetear TODO? Se borrarán todos los tests y votos del equipo. Esta acción no se puede deshacer.'))return;
-  if(!confirm('¿Estás completamente segura? Se perderán TODOS los datos.'))return;
-  ov(true);
-  const ok=await window.FB.resetAll();
-  ov(false);
-  if(ok){
-    players.forEach(p=>{p.selfScores=null;p.selfPrimary=null;});
-    teamVotes={};
-    toast('✅ Todos los datos han sido eliminados');
-    updStats();
-    await refreshAdmin();
-  } else toast('❌ Error al resetear');
-}
-
-function getTip(f,t){
-  const tips={'D-I':'Dale contexto emocional y celebra sus ideas. Necesita sentir que la escuchas.','D-S':'Baja la intensidad. Escúchala antes de proponer soluciones.','D-C':'Trae datos y razones claras. No esperes que actúe sin entender el porqué.','I-D':'Ve al grano y muéstrale el impacto concreto. Objetivo, acción, resultado.','I-S':'Sé constante y dale tiempo. Valora su lealtad; no necesita espectáculo, sino presencia.','I-C':'Sé más precisa y estructura tus ideas. Respeta su necesidad de analizar.','S-D':'Sé más directa y habla de lo que quieres. No esperes a que lo adivine.','S-I':'Participa más activamente. Tu aportación vale mucho aunque no la impongas.','S-C':'Dale tiempo y datos. No la presiones a decidir sin la información que necesita.','C-D':'Comunica con más rapidez. Ella quiere acción, no análisis interminable.','C-I':'Sé más expresiva y espontánea. Celebra con ella y comparte tus emociones.','C-S':'Cuida el vínculo humano. Pregúntale cómo está antes de hablar de táctica.'};
-  return tips[f+'-'+t]||'Adapta tu ritmo y estilo a sus necesidades.';
-}
-
-window.addEventListener('load',init);
-</script>
-</body>
-</html>
+    setTimeout(()=>document.getElementById('admin-pwd').placehold
